@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LegalAI - Transform Legal Documents Into Plain English | AI-Powered Legal Analysis</title>
+    <meta name="description" content="Upload any legal document and get instant AI-powered summaries, risk analysis, and clause explanations in simple language. No legal degree required.">
+    <meta name="author" content="LegalAI">
+    <meta name="keywords" content="legal AI, document analysis, contract review, legal tech, plain language, risk analysis">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="LegalAI - AI-Powered Legal Document Analysis">
+    <meta property="og:description" content="Transform complex legal documents into plain English with AI-powered analysis, risk detection, and clause explanations.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@legalai_platform">
+    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png">
+    
+    <!-- Canonical -->
+    <link rel="canonical" href="https://legalai.example.com">
+
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <!-- Logo -->
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i data-lucide="scale"></i>
+                        <i data-lucide="bot" class="bot-icon"></i>
+                    </div>
+                    <span class="logo-text">LegalAI</span>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <nav class="desktop-nav">
+                    <a href="#features" class="nav-link">Features</a>
+                    <a href="#how-it-works" class="nav-link">How It Works</a>
+                    <a href="#pricing" class="nav-link">Pricing</a>
+                    <a href="#security" class="nav-link">Security</a>
+                </nav>
+
+                <!-- CTA Buttons -->
+                <div class="desktop-cta">
+                    <button class="btn btn-ghost">Sign In</button>
+                    <button class="btn btn-hero">Try Free Demo</button>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i data-lucide="menu" id="menuIcon"></i>
+                    <i data-lucide="x" id="closeIcon" style="display: none;"></i>
+                </button>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div class="mobile-menu" id="mobileMenu">
+                <nav class="mobile-nav">
+                    <a href="#features" class="mobile-nav-link">Features</a>
+                    <a href="#how-it-works" class="mobile-nav-link">How It Works</a>
+                    <a href="#pricing" class="mobile-nav-link">Pricing</a>
+                    <a href="#security" class="mobile-nav-link">Security</a>
+                    <div class="mobile-cta">
+                        <button class="btn btn-ghost">Sign In</button>
+                        <button class="btn btn-hero">Try Free Demo</button>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <!-- Background Elements -->
+            <div class="hero-bg"></div>
+            <div class="hero-blur-1"></div>
+            <div class="hero-blur-2"></div>
+            
+            <div class="container">
+                <div class="hero-grid">
+                    <!-- Left Content -->
+                    <div class="hero-content">
+                        <div class="hero-badge">
+                            <i data-lucide="brain"></i>
+                            AI-Powered Legal Intelligence
+                        </div>
+                        
+                        <h1 class="hero-title">
+                            Transform
+                            <span class="hero-gradient-text"> Legal Documents </span>
+                            Into Plain English
+                        </h1>
+                        
+                        <p class="hero-description">
+                            Upload any legal document and get instant AI-powered summaries, risk analysis, 
+                            and clause explanations in simple language. No legal degree required.
+                        </p>
+
+                        <!-- Key Benefits -->
+                        <div class="benefits-grid">
+                            <div class="benefit-item">
+                                <i data-lucide="upload"></i>
+                                <span>Instant Upload & Analysis</span>
+                            </div>
+                            <div class="benefit-item">
+                                <i data-lucide="brain"></i>
+                                <span>AI-Powered Insights</span>
+                            </div>
+                            <div class="benefit-item">
+                                <i data-lucide="shield"></i>
+                                <span>Bank-Level Security</span>
+                            </div>
+                            <div class="benefit-item">
+                                <i data-lucide="users"></i>
+                                <span>Multilingual Support</span>
+                            </div>
+                        </div>
+
+                        <!-- CTA Buttons -->
+                        <div class="hero-cta">
+                            <button class="btn btn-hero btn-lg">
+                                Start Free Analysis
+                                <i data-lucide="arrow-right"></i>
+                            </button>
+                            <button class="btn btn-outline btn-lg">
+                                Watch Demo
+                                <i data-lucide="arrow-right"></i>
+                            </button>
+                        </div>
+
+                        <!-- Trust Indicators -->
+                        <div class="trust-section">
+                            <p class="trust-text">Trusted by 10,000+ legal professionals</p>
+                            <div class="trust-logos">
+                                <div class="trust-logo">LawFirm Pro</div>
+                                <div class="trust-logo">Legal Corp</div>
+                                <div class="trust-logo">Justice AI</div>
+                                <div class="trust-logo">DocuLaw</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Image -->
+                    <div class="hero-image-container">
+                        <div class="hero-image-wrapper">
+                            <img src="src/assets/hero-legal-ai.jpg" alt="AI Legal Document Analysis Platform" class="hero-image">
+                            <div class="hero-image-overlay"></div>
+                        </div>
+                        
+                        <!-- Floating Stats -->
+                        <div class="floating-stat stat-1">
+                            <div class="stat-number">99.2%</div>
+                            <div class="stat-label">Accuracy Rate</div>
+                        </div>
+                        
+                        <div class="floating-stat stat-2">
+                            <div class="stat-number">&lt; 30s</div>
+                            <div class="stat-label">Analysis Time</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Document Upload Section -->
+        <section class="upload-section" id="upload">
+            <div class="container">
+                <div class="upload-container">
+                    <!-- Header -->
+                    <div class="section-header">
+                        <h2 class="section-title">Upload Your Legal Document</h2>
+                        <p class="section-description">
+                            Drag and drop any PDF, Word document, or scanned file for instant AI analysis
+                        </p>
+                    </div>
+
+                    <div class="upload-card" id="uploadCard">
+                        <!-- Upload Area -->
+                        <div class="upload-area" id="uploadArea">
+                            <input type="file" accept=".pdf,.doc,.docx" id="fileInput" class="file-input">
+                            
+                            <i data-lucide="upload" class="upload-icon"></i>
+                            
+                            <div class="upload-content">
+                                <h3 class="upload-title">Drop your document here</h3>
+                                <p class="upload-subtitle">or click to browse files</p>
+                                
+                                <div class="upload-info">
+                                    <span>Supports: PDF, DOC, DOCX</span>
+                                    <span>•</span>
+                                    <span>Max size: 50MB</span>
+                                    <span>•</span>
+                                    <span>Encrypted & Secure</span>
+                                </div>
+                            </div>
+
+                            <button class="btn btn-ai btn-lg">Choose File</button>
+                        </div>
+
+                        <!-- Analysis View -->
+                        <div class="analysis-view" id="analysisView" style="display: none;">
+                            <!-- File Info -->
+                            <div class="file-info" id="fileInfo">
+                                <i data-lucide="file-text" class="file-icon"></i>
+                                <div class="file-details">
+                                    <h4 class="file-name" id="fileName"></h4>
+                                    <p class="file-status" id="fileStatus">Analyzing with AI...</p>
+                                </div>
+                                <div class="file-progress" id="fileProgress">
+                                    <div class="spinner"></div>
+                                </div>
+                            </div>
+
+                            <!-- Analysis Progress -->
+                            <div class="progress-section" id="progressSection">
+                                <div class="progress-bar">
+                                    <div class="progress-fill"></div>
+                                </div>
+                                
+                                <div class="progress-steps">
+                                    <div class="progress-step">
+                                        <div class="progress-dot"></div>
+                                        Extracting text content...
+                                    </div>
+                                    <div class="progress-step">
+                                        <div class="progress-dot"></div>
+                                        Identifying clauses...
+                                    </div>
+                                    <div class="progress-step">
+                                        <div class="progress-dot"></div>
+                                        Generating insights...
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Results Preview -->
+                            <div class="results-preview" id="resultsPreview" style="display: none;">
+                                <div class="result-card">
+                                    <i data-lucide="eye" class="result-icon"></i>
+                                    <h4 class="result-title">Plain Language Summary</h4>
+                                    <p class="result-subtitle">Generated in seconds</p>
+                                </div>
+                                
+                                <div class="result-card">
+                                    <i data-lucide="alert-triangle" class="result-icon warning"></i>
+                                    <h4 class="result-title">Risk Analysis</h4>
+                                    <p class="result-subtitle">3 risks identified</p>
+                                </div>
+                                
+                                <div class="result-card">
+                                    <i data-lucide="check-circle" class="result-icon success"></i>
+                                    <h4 class="result-title">Key Clauses</h4>
+                                    <p class="result-subtitle">12 clauses explained</p>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="action-buttons" id="actionButtons">
+                                <button class="btn btn-hero btn-lg" id="viewAnalysisBtn" style="display: none;">
+                                    View Full Analysis
+                                </button>
+                                <button class="btn btn-outline btn-lg" id="downloadReportBtn" style="display: none;">
+                                    Download Report
+                                </button>
+                                
+                                <button class="btn btn-ghost" id="uploadAnotherBtn">
+                                    Upload Another Document
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard Section -->
+        <section class="dashboard-section" id="dashboard">
+            <div class="container">
+                <div class="dashboard-container">
+                    <!-- Header -->
+                    <div class="section-header">
+                        <h2 class="section-title">AI-Powered Legal Analysis Dashboard</h2>
+                        <p class="section-description">
+                            Get comprehensive insights about your legal documents in seconds
+                        </p>
+                    </div>
+
+                    <!-- Main Dashboard Grid -->
+                    <div class="dashboard-grid">
+                        
+                        <!-- Left Column - Document Summary -->
+                        <div class="dashboard-main">
+                            
+                            <!-- Document Overview -->
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="document-info">
+                                        <h3 class="document-title">Service Agreement Analysis</h3>
+                                        <p class="document-meta">Uploaded 2 minutes ago • 12 pages • PDF</p>
+                                    </div>
+                                    <div class="status-badge">Analysis Complete</div>
+                                </div>
+
+                                <div class="metrics-grid">
+                                    <div class="metric">
+                                        <div class="metric-value primary">8.2/10</div>
+                                        <div class="metric-label">Overall Score</div>
+                                    </div>
+                                    <div class="metric">
+                                        <div class="metric-value warning">3</div>
+                                        <div class="metric-label">Risk Flags</div>
+                                    </div>
+                                    <div class="metric">
+                                        <div class="metric-value success">12</div>
+                                        <div class="metric-label">Key Clauses</div>
+                                    </div>
+                                    <div class="metric">
+                                        <div class="metric-value secondary">94%</div>
+                                        <div class="metric-label">Confidence</div>
+                                    </div>
+                                </div>
+
+                                <img src="src/assets/ai-document-analysis.jpg" alt="AI Document Analysis Visualization" class="analysis-image">
+
+                                <div class="card-actions">
+                                    <button class="btn btn-hero btn-lg">
+                                        <i data-lucide="eye"></i>
+                                        View Full Analysis
+                                    </button>
+                                    <button class="btn btn-outline btn-lg">
+                                        <i data-lucide="download"></i>
+                                        Export Report
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Plain Language Summary -->
+                            <div class="card">
+                                <div class="card-section-header">
+                                    <i data-lucide="file-text" class="section-icon primary"></i>
+                                    <h4 class="section-title">Plain Language Summary</h4>
+                                    <div class="ai-badge">AI Generated</div>
+                                </div>
+                                
+                                <div class="summary-content">
+                                    <p class="summary-paragraph">
+                                        This is a <strong>service agreement</strong> between your company and a software vendor. 
+                                        The contract runs for <strong class="primary-text">2 years</strong> with automatic renewal unless cancelled. 
+                                        The monthly fee is <strong class="primary-text">$2,500</strong> with potential increases up to 5% annually.
+                                    </p>
+                                    
+                                    <p class="summary-paragraph">
+                                        <strong class="warning-text">Key concerns:</strong> The liability limitation clause significantly 
+                                        reduces the vendor's responsibility for damages. The termination clause requires 90-day notice 
+                                        and may result in early termination penalties.
+                                    </p>
+                                </div>
+
+                                <button class="btn btn-ghost">Read Full Summary →</button>
+                            </div>
+
+                            <!-- Risk Analysis -->
+                            <div class="card">
+                                <div class="card-section-header">
+                                    <i data-lucide="alert-triangle" class="section-icon warning"></i>
+                                    <h4 class="section-title">Risk Analysis</h4>
+                                    <div class="risk-badge">3 Risks Found</div>
+                                </div>
+
+                                <div class="risks-list">
+                                    <div class="risk-item high-risk">
+                                        <i data-lucide="alert-triangle" class="risk-icon"></i>
+                                        <div class="risk-content">
+                                            <h5 class="risk-title">High Risk: Unlimited Liability</h5>
+                                            <p class="risk-description">
+                                                Section 8.2 contains broad indemnification clauses that could expose you to unlimited liability.
+                                            </p>
+                                            <button class="risk-link">View clause details →</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="risk-item medium-risk">
+                                        <i data-lucide="alert-triangle" class="risk-icon"></i>
+                                        <div class="risk-content">
+                                            <h5 class="risk-title">Medium Risk: Auto-Renewal Terms</h5>
+                                            <p class="risk-description">
+                                                The contract auto-renews with only 30-day cancellation notice required.
+                                            </p>
+                                            <button class="risk-link">View clause details →</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="risk-item medium-risk">
+                                        <i data-lucide="alert-triangle" class="risk-icon"></i>
+                                        <div class="risk-content">
+                                            <h5 class="risk-title">Medium Risk: Price Escalation</h5>
+                                            <p class="risk-description">
+                                                Annual price increases up to 5% without notification requirements.
+                                            </p>
+                                            <button class="risk-link">View clause details →</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column - Actions & Stats -->
+                        <div class="dashboard-sidebar">
+                            
+                            <!-- Quick Actions -->
+                            <div class="card">
+                                <h4 class="card-title">Quick Actions</h4>
+                                <div class="action-list">
+                                    <button class="action-btn ai">
+                                        <i data-lucide="message-circle"></i>
+                                        Ask AI Questions
+                                    </button>
+                                    <button class="action-btn outline">
+                                        <i data-lucide="download"></i>
+                                        Download Summary
+                                    </button>
+                                    <button class="action-btn ghost">
+                                        <i data-lucide="users"></i>
+                                        Share Analysis
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Analysis Progress -->
+                            <div class="card">
+                                <h4 class="card-title">Analysis Details</h4>
+                                <div class="progress-list">
+                                    <div class="progress-item">
+                                        <div class="progress-header">
+                                            <span>Text Extraction</span>
+                                            <span class="progress-status complete">Complete</span>
+                                        </div>
+                                        <div class="progress-bar-container">
+                                            <div class="progress-bar-bg">
+                                                <div class="progress-bar-fill complete"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="progress-item">
+                                        <div class="progress-header">
+                                            <span>Clause Identification</span>
+                                            <span class="progress-status complete">Complete</span>
+                                        </div>
+                                        <div class="progress-bar-container">
+                                            <div class="progress-bar-bg">
+                                                <div class="progress-bar-fill complete"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="progress-item">
+                                        <div class="progress-header">
+                                            <span>Risk Assessment</span>
+                                            <span class="progress-status complete">Complete</span>
+                                        </div>
+                                        <div class="progress-bar-container">
+                                            <div class="progress-bar-bg">
+                                                <div class="progress-bar-fill complete"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="progress-item">
+                                        <div class="progress-header">
+                                            <span>AI Summary Generation</span>
+                                            <span class="progress-status complete">Complete</span>
+                                        </div>
+                                        <div class="progress-bar-container">
+                                            <div class="progress-bar-bg">
+                                                <div class="progress-bar-fill complete"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Document Stats -->
+                            <div class="card">
+                                <h4 class="card-title">Document Insights</h4>
+                                <div class="stats-list">
+                                    <div class="stat-row">
+                                        <div class="stat-label">
+                                            <i data-lucide="clock"></i>
+                                            <span>Processing Time</span>
+                                        </div>
+                                        <span class="stat-value">28 seconds</span>
+                                    </div>
+                                    
+                                    <div class="stat-row">
+                                        <div class="stat-label">
+                                            <i data-lucide="file-text"></i>
+                                            <span>Word Count</span>
+                                        </div>
+                                        <span class="stat-value">8,247 words</span>
+                                    </div>
+                                    
+                                    <div class="stat-row">
+                                        <div class="stat-label">
+                                            <i data-lucide="trending-up"></i>
+                                            <span>Complexity Score</span>
+                                        </div>
+                                        <span class="stat-value">7.3/10</span>
+                                    </div>
+                                    
+                                    <div class="stat-row">
+                                        <div class="stat-label">
+                                            <i data-lucide="shield"></i>
+                                            <span>Security Level</span>
+                                        </div>
+                                        <span class="stat-value">Enterprise</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Recent Activity -->
+                            <div class="card">
+                                <h4 class="card-title">Recent Documents</h4>
+                                <div class="recent-list">
+                                    <div class="recent-item">
+                                        <i data-lucide="file-text" class="recent-icon primary"></i>
+                                        <div class="recent-content">
+                                            <p class="recent-name">Employment Contract</p>
+                                            <p class="recent-time">2 hours ago</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="recent-item">
+                                        <i data-lucide="file-text" class="recent-icon secondary"></i>
+                                        <div class="recent-content">
+                                            <p class="recent-name">NDA Agreement</p>
+                                            <p class="recent-time">1 day ago</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="recent-item">
+                                        <i data-lucide="file-text" class="recent-icon warning"></i>
+                                        <div class="recent-content">
+                                            <p class="recent-name">Lease Agreement</p>
+                                            <p class="recent-time">3 days ago</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
