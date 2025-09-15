@@ -43,6 +43,8 @@ function initializeMobileMenu() {
     });
 }
 
+
+
 document.querySelector('a[href="#how-it-works"]').addEventListener('click', function(e) {
   e.preventDefault(); // stop normal anchor scroll
   const btn = document.getElementById('watch-demo');
