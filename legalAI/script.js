@@ -43,6 +43,16 @@ function initializeMobileMenu() {
     });
 }
 
+document.querySelector('a[href="#how-it-works"]').addEventListener('click', function(e) {
+  e.preventDefault(); // stop normal anchor scroll
+  const btn = document.getElementById('watch-demo');
+  if (btn) {
+    btn.scrollIntoView({ behavior: 'smooth', block: 'center' }); // scroll nicely
+    setTimeout(() => btn.click(), 600); // auto-click after scroll (adjust delay if needed)
+  }
+});
+
+
 // File Upload Functionality
 function initializeFileUpload() {
     const uploadArea = document.getElementById('uploadArea');

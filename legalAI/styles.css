@@ -412,6 +412,14 @@ body {
 .benefit-item:nth-child(3) i { color: hsl(var(--success)); }
 .benefit-item:nth-child(4) i { color: hsl(var(--warning)); }
 
+/* Fix scroll offset for all anchor-linked sections */
+#features,
+#how-it-works,
+#pricing,
+#security {
+  scroll-margin-top: 80px; /* match your navbar height */
+}
+
 .hero-cta {
     display: flex;
     flex-direction: column;

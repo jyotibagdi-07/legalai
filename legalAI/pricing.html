@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pricing</title>
+  <link rel="stylesheet" href="styles.css"> <!-- your main CSS -->
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5faff; /* light blue background for page */
+      color: #333;
+    }
+
+    nav {
+      background: #fff;
+      padding: 15px 30px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    nav .nav-link {
+      margin-right: 20px;
+      text-decoration: none;
+      color: #0077cc;
+      font-weight: bold;
+    }
+
+    nav .nav-link:hover {
+      color: #005999;
+    }
+
+    .pricing-container {
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      gap: 20px;
+      padding: 60px 40px;
+      background: #fff; /* pure white background for section */
+    }
+
+    .pricing-card {
+      flex: 1 1 300px;
+      background: #e9f3ff; /* light blue card background */
+      padding: 30px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .pricing-card:hover {
+      transform: translateY(-8px);
+    }
+
+    .pricing-card h2 {
+      margin-bottom: 15px;
+      color: #0077cc; /* blue heading */
+    }
+
+    .pricing-card p {
+      margin-bottom: 20px;
+      line-height: 1.5;
+      color: #444;
+    }
+
+    .features-list {
+      text-align: left;
+      margin-bottom: 20px;
+      color: #222;
+    }
+
+    .features-list li {
+      margin: 8px 0;
+    }
+
+    .pricing-card button {
+      background: #0077cc;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .pricing-card button:hover {
+      background: #005999;
+    }
+  </style>
+</head>
+<body>
+ 
+  <section class="pricing-container">
+    <!-- Free Access -->
+    <div class="pricing-card">
+      <h2>Free Access</h2>
+      <p>Perfect for individuals who want to explore the basics before committing.</p>
+      <ul class="features-list">
+        <li>✔ Generate simple legal documents</li>
+        <li>✔ Create basic rent agreements</li>
+        <li>✔ Limited AI-powered insights</li>
+        <li>✔ Email support only</li>
+      </ul>
+      <button>Start Free</button>
+    </div>
+
+    <!-- 1-Month Plan -->
+    <div class="pricing-card">
+      <h2>1-Month Plan</h2>
+      <p>Best for professionals who need quick access to advanced features without a long-term commitment.</p>
+      <ul class="features-list">
+        <li>✔ Full access to legal document creation</li>
+        <li>✔ Create rent agreements, NDAs, and contracts</li>
+        <li>✔ AI-powered suggestions for clauses</li>
+        <li>✔ Priority chat & email support</li>
+      </ul>
+      <p><strong>₹499 / month</strong></p>
+      <button>Subscribe</button>
+    </div>
+
+    <!-- 3-Month Plan -->
+    <div class="pricing-card">
+      <h2>3-Month Plan</h2>
+      <p>Great for startups and small businesses looking for cost-effective solutions.</p>
+      <ul class="features-list">
+        <li>✔ Everything in 1-Month Plan</li>
+        <li>✔ Bulk document creation</li>
+        <li>✔ Multi-user collaboration</li>
+        <li>✔ Dedicated legal expert guidance</li>
+      </ul>
+      <p><strong>₹1299 / 3 months</strong></p>
+      <button>Subscribe</button>
+    </div>
+  </section>
+</body>
+</html>
