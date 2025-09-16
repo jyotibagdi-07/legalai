@@ -1,4 +1,8 @@
 /* CSS Variables - Design System */
+html {
+  scroll-behavior: smooth;
+}
+
 :root {
     /* Colors (HSL format) */
     --background: 0 0% 100%;
