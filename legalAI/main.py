@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from legal_backend.utils.ai_summarizer import summarize
 from legal_backend.utils.pdf_reader import read_pdf_bytes
 
+
 app = FastAPI()
 
 # Allow frontend to call backend
