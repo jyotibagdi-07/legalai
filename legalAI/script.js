@@ -2,28 +2,60 @@
 
 // DOM elements
 const fileInput = document.getElementById("fileInput");
-const uploadBtn = document.getElementById("uploadBtn");
 const fileStatus = document.getElementById("fileStatus");
 const analysisOutput = document.getElementById("analysisOutput");
+const uploadBtn = document.getElementById("uploadBtn");
+const uploadArea = document.getElementById('uploadArea');
+const analysisView = document.getElementById('analysisView');
+const fileNameDisplay = document.getElementById('fileName');
+const fileProgress = document.getElementById('fileProgress');
+const progressSection = document.getElementById('progressSection');
+const uploadAnotherBtn = document.getElementById('uploadAnotherBtn');
 
-// Backend URL (FastAPI)
-const BACKEND_URL = "http://127.0.0.1:8000/summarize";
+// Backend URL (FastAPI) - Check the port
+const BACKEND_URL = "http://127.0.0.1:8010/analyze";
 
-// Handle file upload button click
-uploadBtn.addEventListener("click", () => {
-    const file = fileInput.files[0];
+// Handle file input change
+fileInput.addEventListener('change', handleFileSelection);
 
-    if (!file) {
-        fileStatus.textContent = "⚠️ Please select a file first!";
-        return;
+// Handle manual upload button
+if (uploadBtn) {
+    uploadBtn.addEventListener('click', () => {
+        const file = fileInput.files[0];
+        if (file) {
+            startAnalysis(file);
+        }
+    });
+}
+
+// Upload Another button
+if (uploadAnotherBtn) {
+    uploadAnotherBtn.addEventListener('click', resetUI);
+}
+
+function handleFileSelection(e) {
+    const file = e.target.files[0];
+    if (file) {
+        startAnalysis(file);
     }
+}
 
-    fileStatus.textContent = "📤 Uploading and analyzing...";
-    handleFileUpload(file);
-});
+function startAnalysis(file) {
+    // Show analysis view and hide upload area
+    if (uploadArea) uploadArea.style.display = 'none';
+    if (analysisView) analysisView.style.display = 'block';
 
-// Upload file to backend
-function handleFileUpload(file) {
+    // Update UI with file info
+    if (fileNameDisplay) fileNameDisplay.textContent = file.name;
+    if (fileStatus) fileStatus.textContent = "📤 Uploading and analyzing...";
+    
+    // Show spinner
+    if (fileProgress) fileProgress.innerHTML = '<div class="spinner"></div>';
+
+    uploadFileToBackend(file);
+}
+
+function uploadFileToBackend(file) {
     const formData = new FormData();
     formData.append("file", file);
 
@@ -31,157 +63,45 @@ function handleFileUpload(file) {
         method: "POST",
         body: formData
     })
-    .then(res => res.json())
+    .then(res => {
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+    })
     .then(data => {
         if (data.summary) {
-            fileStatus.textContent = "✅ Analysis complete!";
+            if (fileStatus) fileStatus.textContent = "✅ Analysis complete!";
             completeAnalysis(data.summary);
         } else {
-            fileStatus.textContent = "❌ Failed to analyze document.";
+            if (fileStatus) fileStatus.textContent = "❌ Failed to analyze document.";
+            if (analysisOutput) analysisOutput.innerHTML = `<p>Error: No summary received.</p>`;
         }
     })
     .catch(err => {
         console.error("Error:", err);
-        fileStatus.textContent = "❌ Error analyzing document.";
+        if (fileStatus) fileStatus.textContent = "❌ Error analyzing document.";
+        if (analysisOutput) analysisOutput.innerHTML = `<p>There was an issue with the backend. Please check the server and try again.</p>`;
     });
 }
 
-<<<<<<< HEAD
-
-
-document.querySelector('a[href="#how-it-works"]').addEventListener('click', function(e) {
-  e.preventDefault(); // stop normal anchor scroll
-  const btn = document.getElementById('watch-demo');
-  if (btn) {
-    btn.scrollIntoView({ behavior: 'smooth', block: 'center' }); // scroll nicely
-    setTimeout(() => btn.click(), 600); // auto-click after scroll (adjust delay if needed)
-  }
-});
-
-
-// File Upload Functionality
-function initializeFileUpload() {
-    const uploadArea = document.getElementById('uploadArea');
-    const fileInput = document.getElementById('fileInput');
-    const analysisView = document.getElementById('analysisView');
-    const fileName = document.getElementById('fileName');
-    const fileStatus = document.getElementById('fileStatus');
-    const fileProgress = document.getElementById('fileProgress');
-    const progressSection = document.getElementById('progressSection');
-    const resultsPreview = document.getElementById('resultsPreview');
-    const viewAnalysisBtn = document.getElementById('viewAnalysisBtn');
-    const downloadReportBtn = document.getElementById('downloadReportBtn');
-    const uploadAnotherBtn = document.getElementById('uploadAnotherBtn');
-    
-    let isDragging = false;
-    let uploadedFile = null;
-    let isAnalyzing = false;
-    
-    // Drag and drop handlers
-    uploadArea.addEventListener('dragover', handleDragOver);
-    uploadArea.addEventListener('dragleave', handleDragLeave);
-    uploadArea.addEventListener('drop', handleDrop);
-    
-    // File input handler
-    fileInput.addEventListener('change', handleFileInput);
-    
-    // Button handlers
-    uploadAnotherBtn.addEventListener('click', resetUpload);
-    
-    function handleDragOver(e) {
-        e.preventDefault();
-        isDragging = true;
-        uploadArea.classList.add('dragging');
-    }
-    
-    function handleDragLeave() {
-        isDragging = false;
-        uploadArea.classList.remove('dragging');
-    }
-    
-    function handleDrop(e) {
-        e.preventDefault();
-        isDragging = false;
-        uploadArea.classList.remove('dragging');
-        
-        const files = Array.from(e.dataTransfer.files);
-        if (files.length > 0) {
-            handleFileUpload(files[0]);
-        }
-    }
-    
-    function handleFileInput(e) {
-        const files = e.target.files;
-        if (files && files.length > 0) {
-            handleFileUpload(files[0]);
-        }
-    }
-    
-    function handleFileUpload(file) {
-        uploadedFile = file.name;
-        isAnalyzing = true;
-        
-        // Show analysis view
-        uploadArea.style.display = 'none';
-        analysisView.style.display = 'block';
-        
-        // Update file info
-        fileName.textContent = uploadedFile;
-        fileStatus.textContent = 'Analyzing with AI...';
-        
-        // Show spinner
-        fileProgress.innerHTML = '<div class="spinner"></div>';
-        
-        // Show progress section
-        progressSection.style.display = 'block';
-        resultsPreview.style.display = 'none';
-        viewAnalysisBtn.style.display = 'none';
-        downloadReportBtn.style.display = 'none';
-        
-        // Simulate AI analysis
-        setTimeout(() => {
-            completeAnalysis();
-        }, 3000);
-    }
-    
-    function completeAnalysis() {
-        isAnalyzing = false;
-        
-        // Update file status
-        fileStatus.textContent = 'Analysis complete';
-        
-        // Show success icon
-        fileProgress.innerHTML = '<i data-lucide="check-circle" class="success-icon"></i>';
-        lucide.createIcons();
-        
-        // Hide progress section and show results
-        progressSection.style.display = 'none';
-        resultsPreview.style.display = 'grid';
-        viewAnalysisBtn.style.display = 'inline-flex';
-        downloadReportBtn.style.display = 'inline-flex';
-    }
-    
-    function resetUpload() {
-        uploadedFile = null;
-        isAnalyzing = false;
-        
-        // Reset UI
-        uploadArea.style.display = 'block';
-        analysisView.style.display = 'none';
-        fileInput.value = '';
-        
-        // Reset progress
-        progressSection.style.display = 'none';
-        resultsPreview.style.display = 'none';
-        viewAnalysisBtn.style.display = 'none';
-        downloadReportBtn.style.display = 'none';
-    }
-=======
-// Show output on webpage
 function completeAnalysis(summary) {
-    analysisOutput.innerHTML = `
-        <h3>📑 Summary</h3>
-        <p>${summary}</p>
-    `;
->>>>>>> 01d927d (first commit)
+    // Hide spinner and show summary
+    if (fileProgress) fileProgress.innerHTML = ''; // Clear spinner
+    if (analysisOutput) {
+        analysisOutput.innerHTML = `
+            <h3>📑 Summary</h3>
+            <p>${summary}</p>
+        `;
+    }
+}
+
+function resetUI() {
+    // Reset all UI elements
+    if (uploadArea) uploadArea.style.display = 'block';
+    if (analysisView) analysisView.style.display = 'none';
+    if (fileInput) fileInput.value = '';
+    if (fileStatus) fileStatus.textContent = '';
+    if (analysisOutput) analysisOutput.innerHTML = '';
+    if (fileNameDisplay) fileNameDisplay.textContent = '';
 }
