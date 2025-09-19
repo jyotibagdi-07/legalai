@@ -1,107 +1,71 @@
-// script.js
-
 // DOM elements
 const fileInput = document.getElementById("fileInput");
 const fileStatus = document.getElementById("fileStatus");
-const analysisOutput = document.getElementById("analysisOutput");
-const uploadBtn = document.getElementById("uploadBtn");
-const uploadArea = document.getElementById('uploadArea');
-const analysisView = document.getElementById('analysisView');
-const fileNameDisplay = document.getElementById('fileName');
-const fileProgress = document.getElementById('fileProgress');
-const progressSection = document.getElementById('progressSection');
-const uploadAnotherBtn = document.getElementById('uploadAnotherBtn');
+const chooseBtn = document.querySelector(".btn-ai"); // "Choose File" button
+// Get button
+const viewAnalysisBtn = document.getElementById("viewAnalysisBtn");
 
-// Backend URL (FastAPI) - Check the port
-const BACKEND_URL = "http://127.0.0.1:8010/analyze";
+// when file is uploaded successfully
+function showSuccessMessage() {
+    alert("✅ Document successfully uploaded!");
 
-// Handle file input change
-fileInput.addEventListener('change', handleFileSelection);
+    // show the button
+    if (viewAnalysisBtn) {
+        viewAnalysisBtn.style.display = "inline-block";
+    }
+}
+if (viewAnalysisBtn) {
+    viewAnalysisBtn.addEventListener("click", () => {
+        window.location.href = "analysis.html";  // redirect to analysis page
+    });
+}
 
-// Handle manual upload button
-if (uploadBtn) {
-    uploadBtn.addEventListener('click', () => {
-        const file = fileInput.files[0];
+
+
+// Trigger file explorer when "Choose File" clicked
+if (chooseBtn && fileInput) {
+    chooseBtn.addEventListener("click", () => fileInput.click());
+}
+
+// File input change event
+if (fileInput) {
+    fileInput.addEventListener("change", (e) => {
+        const file = e.target.files[0];
         if (file) {
-            startAnalysis(file);
+            // Show uploading first
+            fileStatus.style.color = "blue";
+            fileStatus.innerHTML = `📤 Uploading "${file.name}"...`;
+
+            // ✅ Just simulate successful upload (without backend for now)
+            setTimeout(() => {
+                fileStatus.style.color = "green";
+                fileStatus.innerHTML = `✅ Document "<b>${file.name}</b>" uploaded successfully!`;
+            }, 1500); // 1.5 sec delay for effect
         }
     });
 }
-
-// Upload Another button
-if (uploadAnotherBtn) {
-    uploadAnotherBtn.addEventListener('click', resetUI);
-}
-
-function handleFileSelection(e) {
-    const file = e.target.files[0];
-    if (file) {
-        startAnalysis(file);
-    }
-}
-
-function startAnalysis(file) {
-    // Show analysis view and hide upload area
-    if (uploadArea) uploadArea.style.display = 'none';
-    if (analysisView) analysisView.style.display = 'block';
-
-    // Update UI with file info
-    if (fileNameDisplay) fileNameDisplay.textContent = file.name;
-    if (fileStatus) fileStatus.textContent = "📤 Uploading and analyzing...";
-    
-    // Show spinner
-    if (fileProgress) fileProgress.innerHTML = '<div class="spinner"></div>';
-
-    uploadFileToBackend(file);
-}
-
-function uploadFileToBackend(file) {
-    const formData = new FormData();
-    formData.append("file", file);
-
-    fetch(BACKEND_URL, {
-        method: "POST",
-        body: formData
-    })
-    .then(res => {
-        if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status}`);
-        }
-        return res.json();
-    })
-    .then(data => {
-        if (data.summary) {
-            if (fileStatus) fileStatus.textContent = "✅ Analysis complete!";
-            completeAnalysis(data.summary);
-        } else {
-            if (fileStatus) fileStatus.textContent = "❌ Failed to analyze document.";
-            if (analysisOutput) analysisOutput.innerHTML = `<p>Error: No summary received.</p>`;
-        }
-    })
-    .catch(err => {
-        console.error("Error:", err);
-        if (fileStatus) fileStatus.textContent = "❌ Error analyzing document.";
-        if (analysisOutput) analysisOutput.innerHTML = `<p>There was an issue with the backend. Please check the server and try again.</p>`;
+if (viewFullAnalysisBtn) {
+    viewFullAnalysisBtn.addEventListener("click", () => {
+        // Redirect with query param (for PDF name ya analysis data)
+        window.location.href = `analysis.html?file=${encodeURIComponent(fileNameDisplay.textContent)}`;
     });
 }
+// Show info when View Full Analysis is clicked
+document.getElementById("viewAnalysisBtn")?.addEventListener("click", () => {
+    document.getElementById("analysisInfo").style.display = "block";
+});
 
-function completeAnalysis(summary) {
-    // Hide spinner and show summary
-    if (fileProgress) fileProgress.innerHTML = ''; // Clear spinner
-    if (analysisOutput) {
-        analysisOutput.innerHTML = `
-            <h3>📑 Summary</h3>
-            <p>${summary}</p>
-        `;
-    }
-}
+// Export Report
+document.getElementById("exportReportBtn")?.addEventListener("click", () => {
+    document.getElementById("exportStatus").style.display = "block";
+});
 
-function resetUI() {
-    // Reset all UI elements
-    if (uploadArea) uploadArea.style.display = 'block';
-    if (analysisView) analysisView.style.display = 'none';
-    if (fileInput) fileInput.value = '';
-    if (fileStatus) fileStatus.textContent = '';
-    if (analysisOutput) analysisOutput.innerHTML = '';
-    if (fileNameDisplay) fileNameDisplay.textContent = '';
-}
+// Download Summary
+document.getElementById("downloadSummaryBtn")?.addEventListener("click", () => {
+    document.getElementById("summaryStatus").style.display = "block";
+});
+
+// Risk Page
+document.getElementById("viewRiskBtn")?.addEventListener("click", () => {
+    window.location.href = "risk.html";
+});

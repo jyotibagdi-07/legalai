@@ -45,19 +45,17 @@
                 <nav class="desktop-nav">
                     <a href="#features" class="nav-link">Features</a>
                     <a href="#how-it-works" class="nav-link">How It Works</a>
-                    <a href="pricing.html" class="nav-link">Pricing</a>
+                    <a href="#pricing" class="nav-link">Pricing</a>
                     <a href="#security" class="nav-link">Security</a>
                 </nav>
 
                 <!-- CTA Buttons -->
                 <div class="desktop-cta">
-      <!-- 🔹 UPDATED: Sign In button now redirects to signin.html -->
-      <button class="btn btn-ghost" onclick="window.location.href='signin.html'">Sign In</button>
-      
-      <!-- Try Free Demo -> YouTube -->
-        <a href="https://www.youtube.com/live/-AUZEeSEs1o?si=XswtlbueDbp4NXtF" target="_blank" class="btn primary">Try Free Demo</a>
-    </div>
-    
+                    <a href="signin.html" class="btn btn-ghost">Sign In</a>
+
+                    <a href="https://www.youtube.com/watch?v=YOUR_VIDEO_ID" target="_blank" class="btn btn-hero">Try Free Demo</a>
+
+                </div>
 
                 <!-- Mobile Menu Button -->
                 <button class="mobile-menu-btn" id="mobileMenuBtn">
@@ -69,14 +67,12 @@
             <!-- Mobile Menu -->
             <div class="mobile-menu" id="mobileMenu">
                 <nav class="mobile-nav">
-                     <a href="#features" class="nav-link">Features</a>
-                     <a href="#how-it-works" class="nav-link">how it works</a>
-                     <a href="#" class="nav-link" onclick="window.location.href='pricing.html'">Pricing</a>
-
-
-                     <a href="#security" class="nav-link">Security</a>
+                    <a href="#features" class="mobile-nav-link">Features</a>
+                    <a href="#how-it-works" class="mobile-nav-link">How It Works</a>
+                    <a href="#pricing" class="mobile-nav-link">Pricing</a>
+                    <a href="#security" class="mobile-nav-link">Security</a>
                     <div class="mobile-cta">
-                        <button class="btn btn-ghost" onclick="window.location.href='signin.html'">Sign In</button>
+                        <button class="btn btn-ghost">Sign In</button>
                         <button class="btn btn-hero">Try Free Demo</button>
                     </div>
                 </nav>
@@ -113,7 +109,7 @@
                         </p>
 
                         <!-- Key Benefits -->
-                        <div id="features" class="benefits-grid">
+                        <div class="benefits-grid">
                             <div class="benefit-item">
                                 <i data-lucide="upload"></i>
                                 <span>Instant Upload & Analysis</span>
@@ -134,14 +130,16 @@
 
                         <!-- CTA Buttons -->
                         <div class="hero-cta">
-                            <button class="btn btn-hero btn-lg">
-                                Start Free Analysis
-                                <i data-lucide="arrow-right"></i>
-                            </button>
-                            <button class="btn btn-outline btn-lg">
-                                Watch Demo
-                                <i data-lucide="arrow-right"></i>
-                            </button>
+                            <button class="btn btn-hero btn-lg" onclick="document.getElementById('upload').scrollIntoView({behavior: 'smooth'});">
+    Start Free Analysis
+    <i data-lucide="arrow-right"></i>
+</button>
+
+                            <a href="https://www.youtube.com/watch?v=YOUR_VIDEO_ID" target="_blank" class="btn btn-outline btn-lg">
+    Watch Demo
+    <i data-lucide="arrow-right"></i>
+</a>
+
                         </div>
 
                         <!-- Trust Indicators -->
@@ -191,27 +189,29 @@
                     </div>
 
                     <div class="upload-card" id="uploadCard">
-                        <!-- Upload Area -->
-                        <div class="upload-area" id="uploadArea">
-                            <input type="file" accept=".pdf,.doc,.docx" id="fileInput" class="file-input">
-                            
-                            <i data-lucide="upload" class="upload-icon"></i>
-                            
-                            <div class="upload-content">
-                                <h3 class="upload-title">Drop your document here</h3>
-                                <p class="upload-subtitle">or click to browse files</p>
-                                
-                                <div class="upload-info">
-                                    <span>Supports: PDF, DOC, DOCX</span>
-                                    <span>•</span>
-                                    <span>Max size: 50MB</span>
-                                    <span>•</span>
-                                    <span>Encrypted & Secure</span>
-                                </div>
-                            </div>
+                    <div class="upload-area" id="uploadArea">
+    <input type="file" accept=".pdf,.doc,.docx" id="fileInput" class="file-input" style="display:none">
+    
+    <i data-lucide="upload" class="upload-icon"></i>
+    
+    <div class="upload-content">
+        <h3 class="upload-title">Drop your document here</h3>
+        <p class="upload-subtitle">or click to browse files</p>
+        
+        <div class="upload-info">
+            <span>Supports: PDF, DOC, DOCX</span>
+            <span>•</span>
+            <span>Max size: 50MB</span>
+            <span>•</span>
+            <span>Encrypted & Secure</span>
+        </div>
+    </div>
 
-                            <button class="btn btn-ai btn-lg">Choose File</button>
-                        </div>
+    <button id="chooseFileBtn" class="btn btn-ai btn-lg">Choose File</button>
+
+    <p id="fileStatus" style="margin-top:10px; font-weight:500; color:green;"></p>
+
+</div>
 
                         <!-- Analysis View -->
                         <div class="analysis-view" id="analysisView" style="display: none;">
@@ -272,12 +272,23 @@
 
                             <!-- Action Buttons -->
                             <div class="action-buttons" id="actionButtons">
-                                <button class="btn btn-hero btn-lg" id="viewAnalysisBtn" style="display: none;">
-                                    View Full Analysis
-                                </button>
-                                <button class="btn btn-outline btn-lg" id="downloadReportBtn" style="display: none;">
-                                    Download Report
-                                </button>
+                             <button class="btn btn-hero btn-lg" id="viewAnalysisBtn" style="display: none;">
+  View Full Analysis
+</button>
+<div id="analysisInfo" style="display:none; margin-top:15px;">
+  <p><strong>PDF Info:</strong> 12 pages, 8247 words</p>
+  <p><strong>Document Type:</strong> Service Agreement</p>
+  <p><strong>Analyzer:</strong> AI-powered clause and risk detection</p>
+</div>
+
+
+
+                                <button class="btn btn-outline btn-lg" id="exportReportBtn">
+  <i data-lucide="download"></i>
+  Export Report
+</button>
+<p id="exportStatus" style="color:green; display:none; margin-top:10px;">Report downloaded successfully ✅</p>
+
                                 
                                 <button class="btn btn-ghost" id="uploadAnotherBtn">
                                     Upload Another Document
@@ -339,14 +350,15 @@
                                 <img src="src/assets/ai-document-analysis.jpg" alt="AI Document Analysis Visualization" class="analysis-image">
 
                                 <div class="card-actions">
-                                    <button class="btn btn-hero btn-lg">
-                                        <i data-lucide="eye"></i>
-                                        View Full Analysis
-                                    </button>
-                                    <button class="btn btn-outline btn-lg">
-                                        <i data-lucide="download"></i>
-                                        Export Report
-                                    </button>
+                                    <a href="analysis.html" class="btn btn-hero btn-lg" id="viewAnalysisBtn" style="display:none;">
+  View Full Analysis
+</a>
+
+                                    <button class="btn btn-outline btn-lg" id="exportReportBtn">
+  <i data-lucide="download"></i>
+  Export Report
+</button>
+<p id="exportStatus" style="color:green; display:none; margin-top:10px;">Report downloaded successfully ✅</p>
                                 </div>
                             </div>
 
@@ -402,7 +414,8 @@
                                             <p class="risk-description">
                                                 The contract auto-renews with only 30-day cancellation notice required.
                                             </p>
-                                            <button class="risk-link">View clause details →</button>
+                                           <button class="risk-link" id="viewRiskBtn">View Risk Analysis →</button>
+
                                         </div>
                                     </div>
 
@@ -431,10 +444,12 @@
                                         <i data-lucide="message-circle"></i>
                                         Ask AI Questions
                                     </button>
-                                    <button class="action-btn outline">
-                                        <i data-lucide="download"></i>
-                                        Download Summary
-                                    </button>
+                                    <button class="action-btn outline" id="downloadSummaryBtn">
+  <i data-lucide="download"></i>
+  Download Summary
+</button>
+<p id="summaryStatus" style="color:green; display:none; margin-top:10px;">Summary downloaded successfully ✅</p>
+
                                     <button class="action-btn ghost">
                                         <i data-lucide="users"></i>
                                         Share Analysis
