@@ -22,6 +22,7 @@ if (viewAnalysisBtn) {
 
 
 
+
 // Trigger file explorer when "Choose File" clicked
 if (chooseBtn && fileInput) {
     chooseBtn.addEventListener("click", () => fileInput.click());
@@ -68,4 +69,9 @@ document.getElementById("downloadSummaryBtn")?.addEventListener("click", () => {
 // Risk Page
 document.getElementById("viewRiskBtn")?.addEventListener("click", () => {
     window.location.href = "risk.html";
+});
+
+
+document.getElementsByClassName("risk-link1")?.addEventListener("click", () => {
+    window.location.href = "clause1.html";
 });

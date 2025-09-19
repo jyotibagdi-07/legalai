@@ -44,8 +44,12 @@
                 <!-- Desktop Navigation -->
                 <nav class="desktop-nav">
                     <a href="#features" class="nav-link">Features</a>
-                    <a href="#how-it-works" class="nav-link">How It Works</a>
-                    <a href="#pricing" class="nav-link">Pricing</a>
+                     <!-- correct -->
+<a href="https://www.youtube.com/watch?v=-AUZEeSEs1o" target="_blank" rel="noopener noreferrer" class="mobile-nav-link">
+  How It Works
+</a>
+
+                    <a href="pricing.html" class="nav-link">Pricing</a>
                     <a href="#security" class="nav-link">Security</a>
                 </nav>
 
@@ -65,16 +69,7 @@
             </div>
 
             <!-- Mobile Menu -->
-            <div class="mobile-menu" id="mobileMenu">
-                <nav class="mobile-nav">
-                    <a href="#features" class="mobile-nav-link">Features</a>
-                    <a href="#how-it-works" class="mobile-nav-link">How It Works</a>
-                    <a href="#pricing" class="mobile-nav-link">Pricing</a>
-                    <a href="#security" class="mobile-nav-link">Security</a>
-                    <div class="mobile-cta">
-                        <button class="btn btn-ghost">Sign In</button>
-                        <button class="btn btn-hero">Try Free Demo</button>
-                    </div>
+          
                 </nav>
             </div>
         </div>
@@ -109,24 +104,28 @@
                         </p>
 
                         <!-- Key Benefits -->
-                        <div class="benefits-grid">
-                            <div class="benefit-item">
-                                <i data-lucide="upload"></i>
-                                <span>Instant Upload & Analysis</span>
-                            </div>
-                            <div class="benefit-item">
-                                <i data-lucide="brain"></i>
-                                <span>AI-Powered Insights</span>
-                            </div>
-                            <div class="benefit-item">
-                                <i data-lucide="shield"></i>
-                                <span>Bank-Level Security</span>
-                            </div>
-                            <div class="benefit-item">
-                                <i data-lucide="users"></i>
-                                <span>Multilingual Support</span>
-                            </div>
-                        </div>
+                        <!-- Features Section -->
+<section id="features" class="features-section">
+    <div class="benefits-grid">
+        <div class="benefit-item">
+            <i data-lucide="upload"></i>
+            <span>Instant Upload & Analysis</span>
+        </div>
+        <div class="benefit-item">
+            <i data-lucide="brain"></i>
+            <span>AI-Powered Insights</span>
+        </div>
+        <div class="benefit-item">
+            <i data-lucide="shield"></i>
+            <span>Bank-Level Security</span>
+        </div>
+        <div class="benefit-item">
+            <i data-lucide="users"></i>
+            <span>Multilingual Support</span>
+        </div>
+    </div>
+</section>
+
 
                         <!-- CTA Buttons -->
                         <div class="hero-cta">
@@ -135,10 +134,12 @@
     <i data-lucide="arrow-right"></i>
 </button>
 
-                            <a href="https://www.youtube.com/watch?v=YOUR_VIDEO_ID" target="_blank" class="btn btn-outline btn-lg">
-    Watch Demo
-    <i data-lucide="arrow-right"></i>
+  <a href="https://www.youtube.com/watch?v=YOUR_VIDEO_ID" 
+   target="_blank" 
+   class="btn btn-outline">
+   Watch Demo
 </a>
+
 
                         </div>
 
@@ -350,7 +351,7 @@
                                 <img src="src/assets/ai-document-analysis.jpg" alt="AI Document Analysis Visualization" class="analysis-image">
 
                                 <div class="card-actions">
-                                    <a href="analysis.html" class="btn btn-hero btn-lg" id="viewAnalysisBtn" style="display:none;">
+                                 <a href="analysis.html" class="btn btn-hero btn-lg" id="viewAnalysisBtnDashboard">
   View Full Analysis
 </a>
 
@@ -383,8 +384,8 @@
                                         and may result in early termination penalties.
                                     </p>
                                 </div>
-
-                                <button class="btn btn-ghost">Read Full Summary →</button>
+                                 <a href="fullsum.html" class="btn btn-hero btn-lg">Read Full Summary →</a>
+                           
                             </div>
 
                             <!-- Risk Analysis -->
@@ -403,7 +404,7 @@
                                             <p class="risk-description">
                                                 Section 8.2 contains broad indemnification clauses that could expose you to unlimited liability.
                                             </p>
-                                            <button class="risk-link">View clause details →</button>
+                                            <a href="clause1.html" class="risk-link1">View clause details →</button>
                                         </div>
                                     </div>
 
@@ -414,21 +415,13 @@
                                             <p class="risk-description">
                                                 The contract auto-renews with only 30-day cancellation notice required.
                                             </p>
-                                           <button class="risk-link" id="viewRiskBtn">View Risk Analysis →</button>
+                                           <a href="risk.html" class="risk-link">View Risk Analysis →</a>
+
 
                                         </div>
                                     </div>
 
-                                    <div class="risk-item medium-risk">
-                                        <i data-lucide="alert-triangle" class="risk-icon"></i>
-                                        <div class="risk-content">
-                                            <h5 class="risk-title">Medium Risk: Price Escalation</h5>
-                                            <p class="risk-description">
-                                                Annual price increases up to 5% without notification requirements.
-                                            </p>
-                                            <button class="risk-link">View clause details →</button>
-                                        </div>
-                                    </div>
+                                 
                                 </div>
                             </div>
                         </div>
