@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clause Comparison Tool - LegalAI</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: white;
+      margin: 0;
+      padding: 0;
+      color: #222;
+    }
+
+    header {
+      background-color: #004aad;
+      color: white;
+      text-align: center;
+      padding: 1rem;
+      font-size: 1.6rem;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 2rem;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    .upload-section {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      gap: 1.5rem;
+    }
+
+    .box {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    label {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+      color: #004aad;
+    }
+
+    textarea {
+      width: 100%;
+      height: 350px;
+      padding: 1rem;
+      font-size: 1rem;
+      border: 1.5px solid #ccc;
+      border-radius: 10px;
+      outline: none;
+      resize: none;
+      transition: all 0.3s ease;
+      background: #fafafa;
+    }
+
+    textarea:focus {
+      border-color: #004aad;
+      background: #fff;
+      box-shadow: 0 0 6px rgba(0, 74, 173, 0.3);
+    }
+
+    input[type="file"] {
+      margin-bottom: 1rem;
+      padding: 0.3rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    button {
+      background-color: #004aad;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 0.8rem 2rem;
+      cursor: pointer;
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-top: 1rem;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #00307a;
+    }
+
+    .result {
+      width: 100%;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-top: 2rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .added { background-color: #d4edda; padding: 5px; border-radius: 6px; margin-bottom: 5px; }
+    .removed { background-color: #f8d7da; padding: 5px; border-radius: 6px; margin-bottom: 5px; }
+    .modified { background-color: #fff3cd; padding: 5px; border-radius: 6px; margin-bottom: 5px; }
+
+    .no-diff { text-align: center; color: #666; }
+  </style>
+</head>
+<body>
+
+  <header>⚖ LegalAI - Clause Comparison Tool</header>
+
+  <div class="container">
+    <div class="upload-section">
+      <div class="box">
+        <label>📂 Upload Old Contract (PDF or TXT)</label>
+        <input type="file" id="oldFile" accept=".pdf,.txt">
+        <textarea id="oldText" placeholder="Paste or upload old contract text..."></textarea>
+      </div>
+
+      <div class="box">
+        <label>📂 Upload New Contract (PDF or TXT)</label>
+        <input type="file" id="newFile" accept=".pdf,.txt">
+        <textarea id="newText" placeholder="Paste or upload new contract text..."></textarea>
+      </div>
+    </div>
+
+    <button onclick="compareContracts()">Compare Clauses</button>
+
+    <div class="result" id="resultBox">
+      <p class="no-diff">Upload or paste contracts and click Compare to see the differences.</p>
+    </div>
+  </div>
+
+  <script>
+    // Handle file uploads (PDF + TXT)
+    document.getElementById("oldFile").addEventListener("change", e => readFile(e, "oldText"));
+    document.getElementById("newFile").addEventListener("change", e => readFile(e, "newText"));
+
+    async function readFile(event, targetId) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      if (file.type === "application/pdf") {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        let text = "";
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          text += content.items.map(item => item.str).join(" ") + "\n";
+        }
+        document.getElementById(targetId).value = text.trim();
+      } else if (file.type === "text/plain") {
+        const reader = new FileReader();
+        reader.onload = e => document.getElementById(targetId).value = e.target.result;
+        reader.readAsText(file);
+      } else {
+        alert("Please upload a PDF or TXT file only.");
+      }
+    }
+
+    // Compare contracts
+    function compareContracts() {
+      const oldText = document.getElementById("oldText").value.trim().split("\n");
+      const newText = document.getElementById("newText").value.trim().split("\n");
+      const resultBox = document.getElementById("resultBox");
+      resultBox.innerHTML = "";
+
+      let changes = [];
+
+      oldText.forEach((line, i) => {
+        if (!newText.includes(line)) {
+          if (newText.some(nl => nl.split(" ").slice(0, 5).join(" ") === line.split(" ").slice(0, 5).join(" "))) {
+            changes.push(<div class="modified">⚠ Modified: ${line}</div>);
+          } else {
+            changes.push(<div class="removed">❌ Removed: ${line}</div>);
+          }
+        }
+      });
+
+      newText.forEach(line => {
+        if (!oldText.includes(line)) {
+          changes.push(<div class="added">✅ Added: ${line}</div>);
+        }
+      });
+
+      resultBox.innerHTML = changes.length ? changes.join("") : <p class='no-diff'>✅ Both contracts are identical.</p>;
+    }
+  </script>
+</body>
+</html>

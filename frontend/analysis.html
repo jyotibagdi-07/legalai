@@ -1,0 +1,216 @@
+<!-- analyzer.html -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LegalDocsAI — Analyzer</title>
+  <link rel="stylesheet" href="css/styleanalyzer.css">
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo">G</div>
+      <div class="brand-text">
+        <div class="title">LegalDocsAI</div>
+        <div class="subtitle">AI Powered PDF Analysis</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <label class="upload-btn">
+        <input id="fileInput" type="file" accept="application/pdf" />
+        Upload PDF
+      </label>
+      <button id="analyzeBtn" class="primary" disabled>Analyze</button>
+    </div>
+  </div>
+
+  <main class="container">
+    <section class="viewer">
+      <div class="doc-header">Document: <span id="docName">No file selected</span></div>
+      <div class="preview">
+        <iframe id="pdfFrame" src="" frameborder="0"></iframe>
+        <div id="noPreview" class="no-preview">Choose or upload a PDF to preview</div>
+      </div>
+    </section>
+
+    <aside class="sidebar">
+      <div class="card summary">
+        <div class="card-title">Summary & Key Findings</div>
+        <div id="sentiment" class="sentiment">Sentiment: —</div>
+        <ul id="summaryBullets" class="bullets">
+        </ul>
+      </div>
+
+      <div class="card clauses">
+        <div class="card-title">Clause Breakdown</div>
+        <div id="clauseList" class="clause-list"></div>
+      </div>
+
+      <div class="card timeline">
+        <div class="card-title">Timeline of Events</div>
+        <div id="timelineContent">
+          <div><strong>Draft:</strong> —</div>
+          <div><strong>Signing:</strong> —</div>
+          <div><strong>Expiry:</strong> —</div>
+        </div>
+      </div>
+
+      <div class="card actions">
+        <button id="reportBtn" class="primary" disabled>Generate Report (PDF/DOCX)</button>
+        <button id="shareBtn">Share Analysis</button>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="footer">Parsed & analyzed: agreement-between-a-manufacturer-and-selling-agent.pdf</footer>
+
+  <script>
+    // Static analysis object generated from the uploaded PDF (pre-filled).
+    // In production replace with fetch('/analyze', ...) result.
+    const analysis = {
+      sentiment: "Neutral / Manufacturer-favourable",
+      sentiment_score: 68,
+      obligations: [
+        "Agent to deposit security sum (amount blank in template).",
+        "Manufacturer to supply initial & replenishment stock on requisition.",
+        "Agent to issue weekly triplicate cash vouchers and statement.",
+        "Agent to remit sale proceeds weekly after commission.",
+        "Agent to keep premises clean & approved; maintain goods' care."
+      ],
+      risks: [
+        { name: "Blank monetary/percentage fields", severity: "High", note: "Security, commission %, initial supply value and exclusivity radius are blank." },
+        { name: "Manufacturer discretion on supply", severity: "Medium", note: "Manufacturer may refuse replenishment at will." },
+        { name: "Post-termination commission", severity: "Medium", note: "No commission after termination unless arbitrator decides." }
+      ],
+      ambiguous: [
+        "Duplicated clauses 1-3 (drafting error).",
+        "Radius for exclusivity blank.",
+        "Exact dispute jurisdiction and arbitration fees not precisely defined."
+      ],
+      clauses: [
+        { name: "Security Deposit", risk: "Medium", detail: "Amount left blank" },
+        { name: "Supply of Goods", risk: "Medium", detail: "Manufacturer discretion to supply further goods" },
+        { name: "Weekly Returns & Cash Vouchers", risk: "Low", detail: "Prescriptive; agent book-keeping requirement" },
+        { name: "Commission", risk: "High", detail: "Commission % blank; credit-sales treatment strict" },
+        { name: "Termination & Notice", risk: "Medium", detail: "Two-year term with short notice on breach" },
+        { name: "Exclusivity / Non-compete", risk: "High", detail: "Radius blank; restricts agent's trade" },
+        { name: "Arbitration", risk: "Low", detail: "Refers to District Bar President; process/fees not fully mapped" }
+      ],
+      timeline: {
+        draft: "Not filled in document",
+        signing: "Not filled in document",
+        expiry: "Two years after signing (signing date blank)"
+      },
+      recommendations: [
+        "Fill all blank monetary and percentage fields before signing (security amount, commission%, radius).",
+        "Add a clear Force Majeure clause and insurance responsibility clause.",
+        "Clarify post-termination commissions and final accounting timeline.",
+        "Fix duplicated text & clean up drafting errors."
+      ]
+    };
+
+    // DOM hooks
+    const fileInput = document.getElementById('fileInput');
+    const pdfFrame = document.getElementById('pdfFrame');
+    const noPreview = document.getElementById('noPreview');
+    const docName = document.getElementById('docName');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const reportBtn = document.getElementById('reportBtn');
+    const shareBtn = document.getElementById('shareBtn');
+
+    fileInput.addEventListener('change', (ev) => {
+      const f = ev.target.files && ev.target.files[0];
+      if (!f) return;
+      docName.textContent = f.name;
+      const url = URL.createObjectURL(f);
+      pdfFrame.src = url;
+      pdfFrame.style.display = 'block';
+      noPreview.style.display = 'none';
+      analyzeBtn.disabled = false;
+      reportBtn.disabled = false;
+      // optionally analyze immediately in-browser (but we'll use the static analysis below)
+    });
+
+    analyzeBtn.addEventListener('click', () => {
+      showAnalysis(analysis);
+    });
+
+    reportBtn.addEventListener('click', () => {
+      alert('Report generation placeholder — connect to backend to generate PDF/DOCX.');
+    });
+
+    shareBtn.addEventListener('click', () => {
+      alert('Share link placeholder — implement server-side share storage or copy-to-clipboard.');
+    });
+
+    function showAnalysis(a) {
+      // Sentiment
+      const sentimentDiv = document.getElementById('sentiment');
+      sentimentDiv.innerHTML = `Sentiment: <strong>${a.sentiment}</strong> (${a.sentiment_score}%)`;
+
+      // Summary bullets
+      const ul = document.getElementById('summaryBullets');
+      ul.innerHTML = '';
+      const bullets = [
+        `Identified ${a.obligations.length} core obligations`,
+        `Flagged ${a.risks.length} potential risks`,
+        `Found ${a.ambiguous.length} ambiguous clauses`
+      ];
+      bullets.forEach(b => {
+        const li = document.createElement('li'); li.textContent = b; ul.appendChild(li);
+      });
+
+      // Clause listing
+      const clDiv = document.getElementById('clauseList');
+      clDiv.innerHTML = '';
+      a.clauses.forEach(c => {
+        const el = document.createElement('div');
+        el.className = 'clause-item';
+        el.innerHTML = `<div class="clause-name">${c.name}</div>
+                        <div class="clause-right">
+                          <span class="risk ${c.risk.toLowerCase()}">${c.risk} Risk</span>
+                          <div class="clause-detail">${c.detail}</div>
+                        </div>`;
+        clDiv.appendChild(el);
+      });
+
+      // Timeline
+      const tl = document.getElementById('timelineContent');
+      tl.innerHTML = `<div><strong>Draft:</strong> ${a.timeline.draft}</div>
+                      <div><strong>Signing:</strong> ${a.timeline.signing}</div>
+                      <div><strong>Expiry:</strong> ${a.timeline.expiry}</div>`;
+
+      // Append recommendations
+      const summaryCard = document.querySelector('.summary');
+      const recTitle = document.createElement('div');
+      recTitle.className = 'rec-title';
+      recTitle.textContent = 'Recommendations';
+      const recList = document.createElement('ul');
+      recList.className = 'rec-list';
+      a.recommendations.forEach(r => {
+        const li = document.createElement('li'); li.textContent = r; recList.appendChild(li);
+      });
+
+      // remove previous if present
+      const prev = document.querySelector('.rec-title');
+      if (!prev) {
+        summaryCard.appendChild(recTitle);
+        summaryCard.appendChild(recList);
+      } else {
+        // update existing
+        const existingRecList = document.querySelector('.rec-list');
+        existingRecList.innerHTML = '';
+        a.recommendations.forEach(r => {
+          const li = document.createElement('li'); li.textContent = r; existingRecList.appendChild(li);
+        });
+      }
+    }
+
+    // Optionally auto-show analysis for the uploaded sample file if you want:
+    // showAnalysis(analysis);
+
+  </script>
+</body>
+</html>
