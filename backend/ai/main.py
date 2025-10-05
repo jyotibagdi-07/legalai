@@ -19,8 +19,8 @@ UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # Load trained model and vectorizer
-model = joblib.load("risk_model.pkl")
-vectorizer = joblib.load("vectorizer.pkl")
+model = joblib.load("assets/risk_model.pkl")
+vectorizer = joblib.load("assets/vectorizer.pkl")
 
 # -------------------------------
 # ✅ FastAPI app setup
@@ -28,8 +28,8 @@ vectorizer = joblib.load("vectorizer.pkl")
 app = FastAPI()
 
 origins = [
-    "https://redesigned-system-5g5v5g944q94cr5r-5503.app.github.dev",  # frontend
-    "https://redesigned-system-5g5v5g944q94cr5r-8016.app.github.dev",  # backend
+    "https://turbo-space-fishstick-5g5v5g944q94cr5r-5503.app.github.dev",  # Frontend URL
+    "https://turbo-space-fishstick-5g5v5g944q94cr5r-8016.app.github.dev"   # Backend URL
 ]
 
 app.add_middleware(
@@ -105,3 +105,7 @@ async def analyze_risk(file: UploadFile = File(...)):
     except Exception as e:
         logging.error("Risk analysis failed:\n" + traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"Failed to analyze risk: {str(e)}")
+if __name__ == "__main__":
+    import uvicorn
+    # The first argument 'app' should match your FastAPI variable (e.g., app = FastAPI())
+    uvicorn.run("backend.ai.main:app", host="0.0.0.0", port=8016, reload=True)

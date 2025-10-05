@@ -4,7 +4,6 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>LegalAI — Document Editor</title>
-  <!-- PDF Generation Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     :root {
@@ -153,7 +152,7 @@
     #agreement-output .nda-h1 { border-top: 1px solid #000; }
     #agreement-output h2 { font-size: 12pt; font-weight: bold; margin-top: 1.5rem; margin-bottom: 0.75rem; }
     .doc-header, .doc-footer { display: flex; justify-content: space-between; font-size: 10pt; margin-bottom: 1.5rem;}
-    .fill-in { border-bottom: 1px solid #000; padding: 0 0.5em; font-weight: bold; }
+    .fill-in { border-bottom: 1px solid #000; padding: 0 0.25em; font-weight: bold; }
     .checkbox { font-family: monospace; }
     
     #loading-overlay {
@@ -171,7 +170,7 @@
 </head>
 <body>
   <header class="topbar">
-    <div class="brand">⚖ LegalAIAssistant</div>
+    <div class="brand">⚖️ LegalAIAssistant</div>
     <nav class="navlinks">
       <a href="#" onclick="showSelectionStage()">Home</a>
       <a href="#" onclick="showSelectionStage()">Templates</a>
@@ -180,21 +179,17 @@
 
   <main class="container">
     
-    <!-- TEMPLATE SELECTION STAGE -->
     <div id="template-selection-stage">
         <h1>Templates</h1>
         <div class="templates-list" id="templatesListContainer"></div>
     </div>
     
-    <!-- EDITOR STAGE (Initially Hidden) -->
     <div id="agreement-editor-stage" class="hidden">
         <div class="editor-grid">
-            <!-- Left Column: Form -->
             <div class="editor-panel form-panel">
                 <h2 id="form-title">Details</h2>
                 <div id="form-fields-container"></div>
             </div>
-            <!-- Right Column: Preview -->
             <div class="editor-panel preview-panel">
                 <div class="preview-header">
                     <h2 id="preview-title">Preview</h2>
@@ -206,7 +201,6 @@
     </div>
   </main>
 
-  <!-- Loading Overlay HTML -->
   <div id="loading-overlay"><div class="spinner"></div></div>
 
   <script>
@@ -217,7 +211,7 @@
     let currentTemplateType = null;
     
     const formatDate = (dateString) => {
-        if (!dateString) return { day: '', month: '', year: '_' };
+        if (!dateString) return { day: '___', month: '______', year: '____' };
         const date = new Date(dateString + 'T00:00:00');
         return {
             day: date.getDate(),
@@ -273,8 +267,8 @@
         return `
         <h1 class="nda-h1">Non-Disclosure Agreement</h1>
         <p>This Non-Disclosure Agreement ("Agreement") is entered into as of <span class="fill-in">${agreementDate.month} ${agreementDate.day}, ${agreementDate.year}</span></p>
-        <p><strong>BY AND BETWEEN:</strong> <span style="display: inline-block; width: 150px; border-bottom: 1px solid #000;">${data.disclosingParty}</span>, located at <span class="fill-in">${data.disclosingPartyLocation || ''}</span></p>
-        <p><strong>AND:</strong> <span style="display: inline-block; width: 200px; border-bottom: 1px solid #000;">${data.receivingParty}</span>, located at <span class="fill-in">${data.receivingPartyLocation || ''}</span></p>
+        <p><strong>BY AND BETWEEN:</strong> <span class="fill-in">${data.disclosingParty || ''}</span>, located at <span class="fill-in">${data.disclosingPartyLocation || ''}</span></p>
+        <p><strong>AND:</strong> <span class="fill-in">${data.receivingParty || ''}</span>, located at <span class="fill-in">${data.receivingPartyLocation || ''}</span></p>
         <h2>1. Definition of Confidential Information</h2>
         <p>For purposes of this Agreement, "Confidential Information" means all non-public, proprietary, or sensitive information disclosed by the Disclosing Party to the Receiving Party, whether in written, oral, electronic, or other form, including but not limited to business strategies, trade secrets, financial data, customer lists, designs, and technical data for the purpose of <span class="fill-in">${data.purpose || ''}.</span></p>
         <h2>2. Obligations of the Receiving Party</h2>
@@ -318,7 +312,7 @@
         </ul>
         <p><strong>NOW THEREFORE</strong>, in consideration of the above recitals, the representations, warranties, and agreements contained in this Agreement and for other good and valuable consideration, the receipt and adequacy of which are now acknowledged, the Parties agree as follows:</p>
         <h2>1. SERVICES PROVIDED</h2>
-        <p>Beginning on upon agreement to this contract, [CONTRACTOR] will provide to [CUSTOMER] the following service (collectively, the /Services"):</p>
+        <p>Beginning on upon agreement to this contract, ${data.contractorName || '[CONTRACTOR]'} will provide to ${data.customerName || '[CUSTOMER]'} the following service (collectively, the "Services"):</p>
         <p>Description of the project: <span class="fill-in">${data.projectDescription || '[DESCRIBE THE SERVICE REQUIRED]'}</span>.</p>
         <h2>2. SCOPE OF WORK</h2>
         <p>Contractor agrees to provide Services pursuant to the Scope of Work set forth in Exhibit A attached hereto (the "Scope of Work").</p>
@@ -334,7 +328,7 @@
         const agreementDate = formatDate(data.agreementDate);
         const startDate = formatDate(data.termStartDate);
         const endDate = formatDate(data.termEndDate);
-        const responsibilitiesList = data.responsibilities ? data.responsibilities.split('\n').map(item => <li>${item}</li>).join('') : '';
+        const responsibilitiesList = data.responsibilities ? data.responsibilities.split('\n').map(item => `<li>${item}</li>`).join('') : '';
 
         return `
         <div class="doc-header">
@@ -355,8 +349,8 @@
         </ul>
         <p><strong>Probation Period (Check one)</strong></p>
         <ul style="list-style-type: none; padding-left: 20px;">
-             <li><span class="checkbox">${data.probationStatus === 'Yes' ? '☒' : '☐'}</span> Employee's probation period shall be <span class="fill-in">${data.probationDuration || ''}</span> <span class="fill-in">${data.probationUnit || 'month(s)'}</span>, starting from the first day of Employee's employment. In the event that Employee fails to pass the probation period, Employer may terminate this Agreement immediately by giving notice to Employee.</li>
-             <li><span class="checkbox">${data.probationStatus === 'No' ? '☒' : '☐'}</span> There is NOT a probation period for Employee.</li>
+              <li><span class="checkbox">${data.probationStatus === 'Yes' ? '☒' : '☐'}</span> Employee's probation period shall be <span class="fill-in">${data.probationDuration || ''}</span> <span class="fill-in">${data.probationUnit || 'month(s)'}</span>, starting from the first day of Employee's employment. In the event that Employee fails to pass the probation period, Employer may terminate this Agreement immediately by giving notice to Employee.</li>
+              <li><span class="checkbox">${data.probationStatus === 'No' ? '☒' : '☐'}</span> There is NOT a probation period for Employee.</li>
         </ul>
         <h2>4. Compensation.</h2>
         <p><strong>A. Base Salary.</strong> As compensation for the services provided by Employee under this Agreement, Employer will pay Employee $<span class="fill-in">${data.baseSalary || ''}</span> <span class="checkbox">${data.salaryFrequency === 'per hour' ? '☒' : '☐'}</span> per hour <span class="checkbox">${data.salaryFrequency === 'per week' ? '☒' : '☐'}</span> per week <span class="checkbox">${data.salaryFrequency === 'per month' ? '☒' : '☐'}</span> per month <span class="checkbox">${data.salaryFrequency === 'per year' ? '☒' : '☐'}</span> per year. The amount will be paid to Employee: (Check one)</p>
@@ -518,15 +512,15 @@
         const onInput = 'oninput="generateAgreement()"';
 
         if (field.type === 'textarea') {
-            inputHtml = <textarea id="${field.id}" rows="3" ${onInput}>${field.defaultValue}</textarea>;
+            inputHtml = `<textarea id="${field.id}" rows="3" ${onInput}>${field.defaultValue}</textarea>`;
         } else if (field.type === 'select') {
             inputHtml = `<select id="${field.id}" ${onInput}>
-                ${field.options.map(opt => <option value="${opt}" ${field.defaultValue === opt ? 'selected' : ''}>${opt}</option>).join('')}
+                ${field.options.map(opt => `<option value="${opt}" ${field.defaultValue === opt ? 'selected' : ''}>${opt}</option>`).join('')}
             </select>`;
         } else {
-            inputHtml = <input type="${field.type || 'text'}" id="${field.id}" value="${field.defaultValue}" ${onInput}>;
+            inputHtml = `<input type="${field.type || 'text'}" id="${field.id}" value="${field.defaultValue}" ${onInput}>`;
         }
-        return <div class="form-field"><label for="${field.id}">${field.label}</label>${inputHtml}</div>;
+        return `<div class="form-field"><label for="${field.id}">${field.label}</label>${inputHtml}</div>`;
     }
 
     function loadTemplate(templateType) {
@@ -536,8 +530,8 @@
         selectionStage.style.display = 'none';
         editorStage.classList.remove('hidden');
         
-        document.getElementById('form-title').textContent = ${template.title} Details;
-        document.getElementById('preview-title').textContent = ${template.title} Preview;
+        document.getElementById('form-title').textContent = `${template.title} Details`;
+        document.getElementById('preview-title').textContent = `${template.title} Preview`;
         
         const formContainer = document.getElementById('form-fields-container');
         formContainer.innerHTML = template.fields.map(field => renderField(field)).join('');
@@ -564,7 +558,7 @@
         if (!currentTemplateType) return;
         loadingOverlay.style.display = 'flex';
         const element = document.getElementById('agreement-output');
-        const filename = ${currentTemplateType}_agreement.pdf;
+        const filename = `${currentTemplateType}_agreement.pdf`;
         const options = { margin: 0.75, filename, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }};
         
         // Wait a moment for UI to update before generating PDF
@@ -580,7 +574,7 @@
       { id: "nda", title: "NDA", desc: "To protect confidential information.", icon: "🔒" },
       { id: "service", title: "Service Agreement", desc: "To define terms for services rendered.", icon: "🤝" },
       { id: "employment", title: "Employment Contract", desc: "To formalize an employment offer.", icon: "💼" },
-      { id: "freelance", title: "Freelance Contract", desc: "For independent contractor work.", icon: "✍" }
+      { id: "freelance", title: "Freelance Contract", desc: "For independent contractor work.", icon: "✍️" }
     ];
 
     initialTemplates.forEach(t => {

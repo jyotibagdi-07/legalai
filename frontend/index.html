@@ -8,32 +8,26 @@
     <meta name="author" content="LegalAI">
     <meta name="keywords" content="legal AI, document analysis, contract review, legal tech, plain language, risk analysis">
 
-    <!-- Open Graph -->
     <meta property="og:title" content="LegalAI - AI-Powered Legal Document Analysis">
     <meta property="og:description" content="Transform complex legal documents into plain English with AI-powered analysis, risk detection, and clause explanations.">
     <meta property="og:type" content="website">
     <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png">
 
-    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@legalai_platform">
     <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png">
     
-    <!-- Canonical -->
     <link rel="canonical" href="https://legalai.example.com">
 
-    <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <link rel="stylesheet" href="css/styles.css">
     
 
 </head>
 <body>
-    <!-- Header -->
     <header class="header">
         <div class="container">
             <div class="header-content">
-                <!-- Logo -->
                 <div class="logo">
                     <div class="logo-icon">
                         <i data-lucide="scale"></i>
@@ -42,11 +36,9 @@
                     <span class="logo-text">LegalAI</span>
                 </div>
 
-                <!-- Desktop Navigation -->
                 <nav class="desktop-nav">
                     <a href="#features" class="nav-link">Features</a>
-                     <!-- correct -->
-<a href="https://www.youtube.com/watch?v=-AUZEeSEs1o" target="_blank" rel="noopener noreferrer" class="mobile-nav-link">
+                     <a href="https://www.youtube.com/watch?v=-AUZEeSEs1o" target="_blank" rel="noopener noreferrer" class="mobile-nav-link">
   How It Works
 </a>
 
@@ -56,7 +48,6 @@
 
                 </nav>
 
-                <!-- CTA Buttons -->
                 <div class="desktop-cta">
                     <a href="signin.html" class="btn btn-ghost">Sign In</a>
 
@@ -64,31 +55,25 @@
 
                 </div>
 
-                <!-- Mobile Menu Button -->
                 <button class="mobile-menu-btn" id="mobileMenuBtn">
                     <i data-lucide="menu" id="menuIcon"></i>
                     <i data-lucide="x" id="closeIcon" style="display: none;"></i>
                 </button>
             </div>
 
-            <!-- Mobile Menu -->
-          
-                </nav>
+            </nav>
             </div>
         </div>
     </header>
 
     <main>
-        <!-- Hero Section -->
         <section class="hero-section">
-            <!-- Background Elements -->
             <div class="hero-bg"></div>
             <div class="hero-blur-1"></div>
             <div class="hero-blur-2"></div>
             
             <div class="container">
                 <div class="hero-grid">
-                    <!-- Left Content -->
                     <div class="hero-content">
                         <div class="hero-badge">
                             <i data-lucide="brain"></i>
@@ -106,9 +91,7 @@
                             and clause explanations in simple language. No legal degree required.
                         </p>
 
-                        <!-- Key Benefits -->
-                        <!-- Features Section -->
-<section id="features" class="features-section">
+                        <section id="features" class="features-section">
     <div class="benefits-grid">
         <div class="benefit-item">
             <i data-lucide="upload"></i>
@@ -130,7 +113,6 @@
 </section>
 
 
-                        <!-- CTA Buttons -->
                         <div class="hero-cta">
                             <button class="btn btn-hero btn-lg" onclick="document.getElementById('upload').scrollIntoView({behavior: 'smooth'});">
     Start Free Analysis
@@ -138,15 +120,14 @@
 </button>
 
   <a href="https://www.youtube.com/watch?v=YOUR_VIDEO_ID" 
-   target="_blank" 
-   class="btn btn-outline">
-   Watch Demo
+    target="_blank" 
+    class="btn btn-outline">
+    Watch Demo
 </a>
 
 
                         </div>
 
-                        <!-- Trust Indicators -->
                         <div class="trust-section">
                             <p class="trust-text">Trusted by 10,000+ legal professionals</p>
                             <div class="trust-logos">
@@ -158,14 +139,12 @@
                         </div>
                     </div>
 
-                    <!-- Right Image -->
                     <div class="hero-image-container">
                         <div class="hero-image-wrapper">
-                            <img src="src/assets/hero-legal-ai.jpg" alt="AI Legal Document Analysis Platform" class="hero-image">
+                            <img src="assets/hero-legal-ai.jpg" alt="AI Legal Document Analysis Platform" class="hero-image">
                             <div class="hero-image-overlay"></div>
                         </div>
                         
-                        <!-- Floating Stats -->
                         <div class="floating-stat stat-1">
                             <div class="stat-number">99.2%</div>
                             <div class="stat-label">Accuracy Rate</div>
@@ -180,11 +159,9 @@
             </div>
         </section>
 
-        <!-- Document Upload Section -->
         <section class="upload-section" id="upload">
             <div class="container">
                 <div class="upload-container">
-                    <!-- Header -->
                     <div class="section-header">
                         <h2 class="section-title">Upload Your Legal Document</h2>
                         <p class="section-description">
@@ -217,9 +194,7 @@
 
 </div>
 
-                        <!-- Analysis View -->
                         <div class="analysis-view" id="analysisView" style="display: none;">
-                            <!-- File Info -->
                             <div class="file-info" id="fileInfo">
                                 <i data-lucide="file-text" class="file-icon"></i>
                                 <div class="file-details">
@@ -231,7 +206,6 @@
                                 </div>
                             </div>
 
-                            <!-- Analysis Progress -->
                             <div class="progress-section" id="progressSection">
                                 <div class="progress-bar">
                                     <div class="progress-fill"></div>
@@ -253,7 +227,6 @@
                                 </div>
                             </div>
 
-                            <!-- Results Preview -->
                             <div class="results-preview" id="resultsPreview" style="display: none;">
                                 <div class="result-card">
                                     <i data-lucide="eye" class="result-icon"></i>
@@ -274,7 +247,6 @@
                                 </div>
                             </div>
 
-                            <!-- Action Buttons -->
                             <div class="action-buttons" id="actionButtons">
                              <button class="btn btn-hero btn-lg" id="viewAnalysisBtn" style="display: none;">
   View Full Analysis
@@ -304,11 +276,9 @@
             </div>
         </section>
 
-        <!-- Dashboard Section -->
         <section class="dashboard-section" id="dashboard">
             <div class="container">
                 <div class="dashboard-container">
-                    <!-- Header -->
                     <div class="section-header">
                         <h2 class="section-title">AI-Powered Legal Analysis Dashboard</h2>
                         <p class="section-description">
@@ -316,13 +286,10 @@
                         </p>
                     </div>
 
-                    <!-- Main Dashboard Grid -->
                     <div class="dashboard-grid">
                         
-                        <!-- Left Column - Document Summary -->
                         <div class="dashboard-main">
                             
-                            <!-- Document Overview -->
                             <div class="card">
                                 <div class="card-header">
                                     <div class="document-info">
@@ -351,10 +318,10 @@
                                     </div>
                                 </div>
 
-                                <img src="src/assets/ai-document-analysis.jpg" alt="AI Document Analysis Visualization" class="analysis-image">
+                                <img src="assets/ai-document-analysis.jpg" alt="AI Document Analysis Visualization" class="analysis-image">
 
                                 <div class="card-actions">
-                                 <a href="analysis.html" class="btn btn-hero btn-lg" id="viewAnalysisBtnDashboard">
+                                   <a href="analysis.html" class="btn btn-hero btn-lg" id="viewAnalysisBtnDashboard">
   View Full Analysis
 </a>
 
@@ -366,7 +333,6 @@
                                 </div>
                             </div>
 
-                            <!-- Plain Language Summary -->
                             <div class="card">
                                 <div class="card-section-header">
                                     <i data-lucide="file-text" class="section-icon primary"></i>
@@ -387,11 +353,10 @@
                                         and may result in early termination penalties.
                                     </p>
                                 </div>
-                                 <a href="fullsum.html" class="btn btn-hero btn-lg">Read Full Summary →</a>
-                           
+                                   <a href="fullsum.html" class="btn btn-hero btn-lg">Read Full Summary →</a>
+                            
                             </div>
 
-                            <!-- Risk Analysis -->
                             <div class="card">
                                 <div class="card-section-header">
                                     <i data-lucide="alert-triangle" class="section-icon warning"></i>
@@ -418,27 +383,25 @@
                                             <p class="risk-description">
                                                 The contract auto-renews with only 30-day cancellation notice required.
                                             </p>
-                                           <a href="risk.html" class="risk-link">View Risk Analysis →</a>
+                                            <a href="risk.html" class="risk-link">View Risk Analysis →</a>
 
 
                                         </div>
                                     </div>
 
-                                 
+                                    
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Right Column - Actions & Stats -->
                         <div class="dashboard-sidebar">
                             
-                            <!-- Quick Actions -->
                             <div class="card">
                                 <h4 class="card-title">Quick Actions</h4>
                                 <div class="action-list">
                                     <button class="action-btn ai" onclick="window.location.href='chatbot.html'">
-                                       <i data-lucide="message-circle"></i>
-                                       Ask AI Questions
+                                        <i data-lucide="message-circle"></i>
+                                        Ask AI Questions
                                     </button>
                                     </button>
   <button class="action-btn outline" onclick="window.location.href='fullsum.html'">
@@ -454,7 +417,6 @@
                                 </div>
                             </div>
 
-                            <!-- Analysis Progress -->
                             <div class="card">
                                 <h4 class="card-title">Analysis Details</h4>
                                 <div class="progress-list">
@@ -508,7 +470,6 @@
                                 </div>
                             </div>
 
-                            <!-- Document Stats -->
                             <div class="card">
                                 <h4 class="card-title">Document Insights</h4>
                                 <div class="stats-list">
@@ -546,7 +507,6 @@
                                 </div>
                             </div>
 
-                            <!-- Recent Activity -->
                             <div class="card">
                                 <h4 class="card-title">Recent Documents</h4>
                                 <div class="recent-list">
