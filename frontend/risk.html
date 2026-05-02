@@ -65,7 +65,7 @@
 
       <div class="actions">
         <!-- 👇 summary page link -->
-        <button class="btn primary" onclick="window.location.href='summary.html'">Generate Full Report (PDF)</button>
+        <button class="btn primary" onclick="window.location.href='fullsum.html'">Generate Full Report (PDF)</button>
         <button class="btn">Schedule Consultation</button>
       </div>
     </section>
@@ -80,52 +80,65 @@
 
     let gaugeChart, barChart;
 
+    function loadAnalysis(analysis, fileName) {
+      if (!analysis) return;
+
+      docList.innerHTML = `
+        <div class="doc-item">
+          <span>${fileName || analysis.filename || "Uploaded document"}</span>
+          <button onclick="analyzeDoc()">Review Risks</button>
+        </div>
+      `;
+
+      window.currentRiskAnalysis = analysis;
+      analyzeDoc();
+    }
+
     // === File Upload ===
-    fileInput.addEventListener("change", () => {
+    fileInput.addEventListener("change", async () => {
       const file = fileInput.files[0];
       if (!file) return;
 
-      // Show file in list
-      docList.innerHTML = `
-        <div class="doc-item">
-          <span>${file.name}</span>
-          <button onclick="analyzeDoc('${file.name}')">Review Risks</button>
-        </div>
-      `;
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("http://127.0.0.1:8016/analyze", {
+        method: "POST",
+        body: formData
+      });
+      const analysis = await response.json();
+      analysis.uploadedAt = new Date().toISOString();
+      sessionStorage.setItem("analysisResult", JSON.stringify(analysis));
+      sessionStorage.setItem("analyzedFileName", file.name);
+      loadAnalysis(analysis, file.name);
     });
 
-    // === Fake Analysis (replace with backend API later) ===
-    function analyzeDoc(name) {
-      // Example results from your PDF analysis
-      const risks = [
-        "Blank values: Security deposit, commission %, exclusivity radius missing.",
-        "Manufacturer discretion: May refuse to supply goods.",
-        "Post-termination commission clause unfavorable.",
-        "Exclusivity radius ambiguous.",
-        "Duplicated clauses weaken enforceability."
-      ];
+    function analyzeDoc() {
+      const analysis = window.currentRiskAnalysis || JSON.parse(sessionStorage.getItem("analysisResult") || "null");
+      const risks = analysis?.risks || [];
+      const score = analysis?.scores?.risk_score || 0;
 
-      const score = 72; // from analysis
-
-      // Update score
       riskScoreEl.textContent = score + "%";
       riskAlertEl.textContent = score >= 70 ? "HIGH RISK DETECTED" : "LOW RISK";
       riskAlertEl.style.color = score >= 70 ? "#dc2626" : "#059669";
 
-      // Update risk list
       riskList.innerHTML = "";
-      risks.forEach(r => {
+      if (!risks.length) {
         const li = document.createElement("li");
-        li.textContent = r;
+        li.textContent = analysis?.message || "No risks detected.";
         riskList.appendChild(li);
-      });
+      } else {
+        risks.forEach(r => {
+          const li = document.createElement("li");
+          li.textContent = `${r.severity} Risk: ${r.title} - ${r.description}`;
+          riskList.appendChild(li);
+        });
+      }
 
-      // Update charts
-      updateCharts(score);
+      updateCharts(score, risks);
     }
 
-    // === Charts ===
-    function updateCharts(score) {
+    function updateCharts(score, risks) {
       const ctxGauge = document.getElementById('riskGauge').getContext('2d');
       if (gaugeChart) gaugeChart.destroy();
       gaugeChart = new Chart(ctxGauge, {
@@ -146,14 +159,25 @@
 
       const ctx = document.getElementById('riskChart').getContext('2d');
       if (barChart) barChart.destroy();
+      const high = risks.filter(r => r.severity === "High").length;
+      const medium = risks.filter(r => r.severity === "Medium").length;
+      const low = risks.filter(r => r.severity === "Low").length;
+      const categoryScores = risks.reduce((acc, risk) => {
+        const key = risk.category || "General";
+        acc[key] = (acc[key] || 0) + 1;
+        return acc;
+      }, {});
+      const labels = Object.keys(categoryScores).length ? Object.keys(categoryScores) : ["General"];
+      const values = labels.map(label => categoryScores[label] || 0);
       barChart = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: ['Contractual', 'Compliance', 'Financial', 'Operational'],
+          labels,
           datasets: [
-            { label: 'High Risk', data: [3, 0, 1, 1], backgroundColor: '#dc2626' },
-            { label: 'Medium Risk', data: [2, 1, 0, 1], backgroundColor: '#f59e0b' },
-            { label: 'Low Risk', data: [1, 1, 0, 0], backgroundColor: '#059669' }
+            { label: 'High Risk', data: labels.map(() => high), backgroundColor: '#dc2626' },
+            { label: 'Medium Risk', data: labels.map(() => medium), backgroundColor: '#f59e0b' },
+            { label: 'Low Risk', data: labels.map(() => low), backgroundColor: '#059669' },
+            { label: 'Items by Category', data: values, backgroundColor: '#2563eb' }
           ]
         },
         options: {
@@ -161,6 +185,12 @@
           plugins: { legend: { position: 'bottom' } }
         }
       });
+    }
+
+    const savedAnalysis = sessionStorage.getItem("analysisResult");
+    const savedName = sessionStorage.getItem("analyzedFileName");
+    if (savedAnalysis) {
+      loadAnalysis(JSON.parse(savedAnalysis), savedName);
     }
   </script>
 </body>
