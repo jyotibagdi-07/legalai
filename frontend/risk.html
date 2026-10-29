@@ -6,6 +6,7 @@
   <title>Legal Risk Analyzer</title>
   <link rel="stylesheet" href="css/risk-analyzer.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="js/api.js"></script>
 </head>
 <body>
   <!-- Topbar -->
@@ -65,7 +66,7 @@
 
       <div class="actions">
         <!-- 👇 summary page link -->
-        <button class="btn primary" onclick="window.location.href='summary.html'">Generate Full Report (PDF)</button>
+        <button class="btn primary" onclick="window.location.href='fullsum.html'">Generate Full Report (PDF)</button>
         <button class="btn">Schedule Consultation</button>
       </div>
     </section>
@@ -81,51 +82,104 @@
     let gaugeChart, barChart;
 
     // === File Upload ===
-    fileInput.addEventListener("change", () => {
+    fileInput.addEventListener("change", async () => {
       const file = fileInput.files[0];
       if (!file) return;
 
-      // Show file in list
       docList.innerHTML = `
         <div class="doc-item">
           <span>${file.name}</span>
-          <button onclick="analyzeDoc('${file.name}')">Review Risks</button>
+          <button id="runRiskBtn">Analyzing...</button>
         </div>
       `;
+      
+      try {
+        const result = await legalAiAnalyzeFile(file);
+        sessionStorage.setItem('analyzedFileName', file.name);
+        sessionStorage.setItem('analysisResult', JSON.stringify(result));
+        
+        docList.innerHTML = `
+          <div class="doc-item">
+            <span>${file.name}</span>
+            <button onclick="loadStoredAnalysis()">Review Risks</button>
+          </div>
+        `;
+        
+        displayAnalysis(result);
+        alert("✅ Risk analysis complete!");
+        
+      } catch (err) {
+        console.error(err);
+        docList.innerHTML = `<span style="color: red; font-size: 0.8rem;">Upload failed. Backend offline?</span>`;
+        alert("❌ Failed to analyze risk. Ensure backend is running on port 8016.");
+      }
     });
 
-    // === Fake Analysis (replace with backend API later) ===
-    function analyzeDoc(name) {
-      // Example results from your PDF analysis
-      const risks = [
-        "Blank values: Security deposit, commission %, exclusivity radius missing.",
-        "Manufacturer discretion: May refuse to supply goods.",
-        "Post-termination commission clause unfavorable.",
-        "Exclusivity radius ambiguous.",
-        "Duplicated clauses weaken enforceability."
-      ];
-
-      const score = 72; // from analysis
-
-      // Update score
+    // === Display Analysis ===
+    function displayAnalysis(data) {
+      const score = data.risk_score || 30;
+      
+      // Update score text
       riskScoreEl.textContent = score + "%";
-      riskAlertEl.textContent = score >= 70 ? "HIGH RISK DETECTED" : "LOW RISK";
-      riskAlertEl.style.color = score >= 70 ? "#dc2626" : "#059669";
+      riskAlertEl.textContent = score >= 70 ? "HIGH RISK DETECTED" : (score >= 40 ? "MEDIUM RISK" : "LOW RISK");
+      riskAlertEl.style.color = score >= 70 ? "#dc2626" : (score >= 40 ? "#d97706" : "#059669");
 
-      // Update risk list
+      // Update risks list
       riskList.innerHTML = "";
-      risks.forEach(r => {
+      if (data.risks && data.risks.length > 0) {
+        data.risks.forEach(r => {
+          const li = document.createElement("li");
+          li.innerHTML = `<strong>${r.name} (${r.severity} Severity):</strong> ${r.note}`;
+          riskList.appendChild(li);
+        });
+      } else {
         const li = document.createElement("li");
-        li.textContent = r;
+        li.textContent = "No risks flagged. Document is clean.";
         riskList.appendChild(li);
-      });
+      }
+
+      // Categorize risks for bar chart
+      let high = [0, 0, 0, 0]; // Contractual, Compliance, Financial, Operational
+      let med = [0, 0, 0, 0];
+      let low = [0, 0, 0, 0];
+
+      if (data.risks) {
+        data.risks.forEach(r => {
+          const nameLower = (r.name || "").toLowerCase();
+          const noteLower = (r.note || "").toLowerCase();
+          let catIdx = 0; // default to contractual
+          
+          if (nameLower.includes("compliance") || nameLower.includes("jurisdict") || nameLower.includes("law") || noteLower.includes("arbitrat")) {
+            catIdx = 1;
+          } else if (nameLower.includes("payment") || nameLower.includes("fee") || nameLower.includes("commission") || noteLower.includes("monetary")) {
+            catIdx = 2;
+          } else if (nameLower.includes("termination") || nameLower.includes("exclusiv") || nameLower.includes("renew") || noteLower.includes("cancel")) {
+            catIdx = 3;
+          }
+          
+          if (r.severity === "High") {
+            high[catIdx]++;
+          } else if (r.severity === "Medium") {
+            med[catIdx]++;
+          } else {
+            low[catIdx]++;
+          }
+        });
+      }
+
+      // If no risks parsed, put default counts
+      if (high.reduce((a, b) => a + b, 0) + med.reduce((a, b) => a + b, 0) + low.reduce((a, b) => a + b, 0) === 0) {
+        high = [1, 0, 0, 0];
+        med = [0, 0, 0, 0];
+        low = [0, 1, 0, 0];
+      }
 
       // Update charts
-      updateCharts(score);
+      updateCharts(score, high, med, low);
     }
 
     // === Charts ===
-    function updateCharts(score) {
+    function updateCharts(score, highData, medData, lowData) {
       const ctxGauge = document.getElementById('riskGauge').getContext('2d');
       if (gaugeChart) gaugeChart.destroy();
       gaugeChart = new Chart(ctxGauge, {
@@ -134,7 +188,7 @@
           labels: ['Risk', 'Safe'],
           datasets: [{
             data: [score, 100 - score],
-            backgroundColor: ['#dc2626', '#e5e7eb'],
+            backgroundColor: [score >= 70 ? '#dc2626' : (score >= 40 ? '#f59e0b' : '#059669'), '#e5e7eb'],
             borderWidth: 0
           }]
         },
@@ -151,9 +205,9 @@
         data: {
           labels: ['Contractual', 'Compliance', 'Financial', 'Operational'],
           datasets: [
-            { label: 'High Risk', data: [3, 0, 1, 1], backgroundColor: '#dc2626' },
-            { label: 'Medium Risk', data: [2, 1, 0, 1], backgroundColor: '#f59e0b' },
-            { label: 'Low Risk', data: [1, 1, 0, 0], backgroundColor: '#059669' }
+            { label: 'High Risk', data: highData || [3, 0, 1, 1], backgroundColor: '#dc2626' },
+            { label: 'Medium Risk', data: medData || [2, 1, 0, 1], backgroundColor: '#f59e0b' },
+            { label: 'Low Risk', data: lowData || [1, 1, 0, 0], backgroundColor: '#059669' }
           ]
         },
         options: {
@@ -162,6 +216,40 @@
         }
       });
     }
+
+    function loadStoredAnalysis() {
+      const storedResult = sessionStorage.getItem('analysisResult');
+      const storedFileName = sessionStorage.getItem('analyzedFileName');
+      if (storedResult && storedFileName) {
+        try {
+          const resultObj = JSON.parse(storedResult);
+          docList.innerHTML = `
+            <div class="doc-item">
+              <span>${storedFileName}</span>
+              <button onclick="loadStoredAnalysis()">Review Risks</button>
+            </div>
+          `;
+          displayAnalysis(resultObj);
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+
+    // Load on start
+    document.addEventListener("DOMContentLoaded", () => {
+      const storedResult = sessionStorage.getItem('analysisResult');
+      const storedFileName = sessionStorage.getItem('analyzedFileName');
+      if (storedResult && storedFileName) {
+        loadStoredAnalysis();
+      } else {
+        // Render empty/zero state
+        displayAnalysis({
+          risk_score: 0,
+          risks: []
+        });
+      }
+    });
   </script>
 </body>
 </html>
