@@ -27,11 +27,11 @@ CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 LEGALAI_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 REPO_ROOT = os.path.dirname(LEGALAI_DIR)
 
-if REPO_ROOT not in sys.path:
-    sys.path.insert(0, REPO_ROOT)
+if LEGALAI_DIR not in sys.path:
+    sys.path.insert(0, LEGALAI_DIR)
 
-from legalai.backend.ai.utils.pdf_reader import extract_text_from_pdf
-from legalai.backend.ai.utils.ai_summarizer import summarize_text
+from backend.ai.utils.pdf_reader import extract_text_from_pdf
+from backend.ai.utils.ai_summarizer import summarize_text
 
 load_dotenv(os.path.join(LEGALAI_DIR, ".env"))
 load_dotenv()
@@ -541,4 +541,5 @@ if os.path.isdir(FRONTEND_DIR):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("legalai.backend.ai.main:app", host="127.0.0.1", port=8016, reload=True)
+    uvicorn.run("backend.ai.main:app", host="127.0.0.1", port=8016, reload=True)
+
