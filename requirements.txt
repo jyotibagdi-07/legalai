@@ -4,5 +4,5 @@ python-multipart
 python-dotenv
 PyPDF2
 openai
-scikit-learn
+scikit-learn==1.7.0
 joblib

@@ -1,6 +1,5 @@
 function legalAiApiBase() {
-  if (window.location.port === "8016") return "";
-  return "http://127.0.0.1:8016";
+  return "";
 }
 
 async function legalAiAnalyzeFile(file) {
@@ -37,3 +36,4 @@ async function legalAiChat(message, context) {
   }
   return response.json();
 }
+
