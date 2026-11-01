@@ -66,6 +66,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Last uploaded document kept in memory so /chat can answer from real text.
+LAST_DOC = {"filename": "", "text": "", "analysis": None}
+
 
 class ChatRequest(BaseModel):
     message: str
@@ -90,154 +93,164 @@ def extract_document_text(path: str, filename: str) -> str:
     return extract_text_from_pdf(path)
 
 
+def remember_document(filename: str, text: str, analysis=None):
+    LAST_DOC["filename"] = filename or ""
+    LAST_DOC["text"] = text or ""
+    LAST_DOC["analysis"] = analysis
+
+
+def _clip(text: str, limit: int = 220) -> str:
+    text = re.sub(r"\s+", " ", text).strip()
+    if len(text) <= limit:
+        return text
+    return text[: limit - 3] + "..."
+
+
+def ml_risk_prediction(text: str):
+    """Return (label, score 0-100) from the trained model, or (None, None)."""
+    if model is None or vectorizer is None:
+        return None, None
+    try:
+        features = vectorizer.transform([text[:20000]])
+        label = str(model.predict(features)[0])
+        score = 40
+        if hasattr(model, "predict_proba"):
+            proba = model.predict_proba(features)[0]
+            classes = list(model.classes_)
+            weights = {"Low": 20, "Medium": 55, "High": 90}
+            score = int(round(sum(float(proba[i]) * weights.get(str(classes[i]), 50) for i in range(len(classes)))))
+        return label, min(max(score, 5), 95)
+    except Exception as err:
+        logging.warning("ML risk prediction failed: %s", err)
+        return None, None
+
+
 def analyze_heuristically(text: str, filename: str) -> dict:
-    """Rule-based legal analysis when an LLM API key is unavailable."""
-    sentences = re.split(r"(?<=[.!?])\s+", text)
+    """Analyze the actual uploaded document text (no canned sample contract)."""
+    sentences = [s.strip() for s in re.split(r"(?<=[.!?])\s+", text) if s.strip()]
     word_count = len(text.split())
 
-    liability_clauses = []
-    termination_clauses = []
-    payment_clauses = []
-    exclusivity_clauses = []
-    dispute_clauses = []
+    buckets = {
+        "liability": [],
+        "termination": [],
+        "payment": [],
+        "exclusivity": [],
+        "dispute": [],
+        "obligation": [],
+        "blank": [],
+    }
 
-    for s in sentences:
-        s_clean = s.strip()
-        if len(s_clean) < 15:
+    for sentence in sentences:
+        if len(sentence) < 12:
             continue
-        s_lower = s_clean.lower()
+        lower = sentence.lower()
+        if any(w in lower for w in ["liability", "indemn", "hold harmless", "damages", "waive"]):
+            buckets["liability"].append(sentence)
+        if any(w in lower for w in ["terminate", "termination", "cancel", "renewal", "notice period", "breach"]):
+            buckets["termination"].append(sentence)
+        if any(w in lower for w in ["payment", "commission", "price", "fee", "invoice", "consideration", "rent"]):
+            buckets["payment"].append(sentence)
+        if any(w in lower for w in ["exclusive", "non-compete", "non compete", "restrict", "territory"]):
+            buckets["exclusivity"].append(sentence)
+        if any(w in lower for w in ["arbitrat", "dispute", "jurisdiction", "governing law", "court"]):
+            buckets["dispute"].append(sentence)
+        if any(w in lower for w in ["shall", "must", "agrees to", "is required", "will pay", "undertake"]):
+            buckets["obligation"].append(sentence)
+        if "____" in sentence or "……" in sentence or "[insert" in lower or "to be filled" in lower:
+            buckets["blank"].append(sentence)
 
-        if any(w in s_lower for w in ["liability", "indemn", "hold harmless", "damage", "responsible", "waive"]):
-            liability_clauses.append(s_clean)
-        if any(w in s_lower for w in ["terminate", "cancel", "renewal", "notice period", "breach"]):
-            termination_clauses.append(s_clean)
-        if any(w in s_lower for w in ["payment", "commission", "price", "fee", "cost", "charge", "invoice"]):
-            payment_clauses.append(s_clean)
-        if any(w in s_lower for w in ["exclusive", "non-compete", "restrict", "territory"]):
-            exclusivity_clauses.append(s_clean)
-        if any(w in s_lower for w in ["arbitrat", "dispute", "jurisdict", "governing law"]):
-            dispute_clauses.append(s_clean)
-
-    obligations = []
-    risks = []
     clauses = []
-    ambiguous = []
+    risks = []
+    obligations = [_clip(s) for s in buckets["obligation"][:6]]
+    ambiguous = [_clip(s) for s in buckets["blank"][:4]]
 
-    if liability_clauses:
-        snippet = liability_clauses[0][:120] + ("..." if len(liability_clauses[0]) > 120 else "")
-        clauses.append({"name": "Limitation of Liability", "risk": "High", "detail": snippet})
-        risks.append({
-            "name": "Liability & Indemnification Risk",
-            "severity": "High",
-            "note": "Indemnification clauses found that may shift unlimited liability or financial risk to your party."
-        })
-    else:
-        clauses.append({"name": "Limitation of Liability", "risk": "Medium", "detail": "No explicit limit on damages found. Standard default rules apply."})
+    def add_clause(name, found, severity_if_found, empty_risk, empty_detail):
+        if found:
+            clauses.append({"name": name, "risk": severity_if_found, "detail": _clip(found[0])})
+            risks.append({
+                "name": name,
+                "severity": severity_if_found,
+                "note": _clip(found[0], 280),
+            })
+        else:
+            clauses.append({"name": name, "risk": empty_risk, "detail": empty_detail})
 
-    if termination_clauses:
-        snippet = termination_clauses[0][:120] + ("..." if len(termination_clauses[0]) > 120 else "")
-        clauses.append({"name": "Termination & Cancellation", "risk": "Medium", "detail": snippet})
-        risks.append({
-            "name": "Auto-Renewal & Notice Terms",
-            "severity": "Medium",
-            "note": "Specific notice terms or automatic renewal conditions exist. Check cancellation windows."
-        })
-    else:
-        clauses.append({"name": "Termination & Notice", "risk": "Low", "detail": "Standard termination on breach or mutual written agreement."})
+    add_clause("Limitation of Liability", buckets["liability"], "High", "Medium", "No explicit liability cap found in the uploaded text.")
+    add_clause("Termination & Notice", buckets["termination"], "Medium", "Low", "No explicit termination/notice language found.")
+    add_clause("Payment Terms", buckets["payment"], "Medium", "Low", "No payment, fee, or commission language found.")
+    add_clause("Exclusivity / Restriction", buckets["exclusivity"], "High", "Low", "No exclusivity or non-compete language found.")
+    add_clause("Dispute Resolution", buckets["dispute"], "Low", "Medium", "No governing law or dispute forum found.")
 
-    if payment_clauses:
-        snippet = payment_clauses[0][:120] + ("..." if len(payment_clauses[0]) > 120 else "")
-        clauses.append({"name": "Payment & Commission Terms", "risk": "Medium", "detail": snippet})
-        obligations.append("Timely payments / remittance of commissions and filing of accounts.")
-    else:
-        clauses.append({"name": "Payment Terms", "risk": "Low", "detail": "No complex fee schedules or commission calculations detected."})
-
-    if exclusivity_clauses:
-        snippet = exclusivity_clauses[0][:120] + ("..." if len(exclusivity_clauses[0]) > 120 else "")
-        clauses.append({"name": "Exclusivity & Non-compete", "risk": "High", "detail": snippet})
-        risks.append({
-            "name": "Exclusivity Restrictions",
-            "severity": "High",
-            "note": "Restricts your ability to engage in competing business, limiting revenue opportunities."
-        })
-    else:
-        clauses.append({"name": "Exclusivity", "risk": "Low", "detail": "Non-exclusive arrangement. Freedom to contract with third parties."})
-
-    if dispute_clauses:
-        snippet = dispute_clauses[0][:120] + ("..." if len(dispute_clauses[0]) > 120 else "")
-        clauses.append({"name": "Dispute Resolution & Jurisdiction", "risk": "Low", "detail": snippet})
-    else:
-        clauses.append({"name": "Governing Law / Jurisdiction", "risk": "Medium", "detail": "No dispute resolution/arbitration venue specified."})
-        ambiguous.append("No governing law or dispute resolution forum is specified.")
-
+    if not buckets["dispute"]:
+        ambiguous.append("No governing law or dispute-resolution forum is specified in this file.")
     if not obligations:
-        preview = " ".join(text.split()[:40])
-        obligations = [
-            f"Review and comply with the terms in {filename or 'this document'}.",
-            preview[:180] + ("..." if len(preview) > 180 else ""),
-        ]
-    if not risks:
-        risks.append({"name": "General Risk", "severity": "Low", "note": "Standard document clauses with minor legal exposures."})
-    if not ambiguous:
-        ambiguous = ["Definition terms for specific roles or performance metrics are missing."]
+        preview = " ".join(text.split()[:45])
+        obligations = [_clip(preview) or f"Review the terms in {filename}."]
 
-    recommendations = [
-        "Review liability limitation caps to match the contract value.",
-        "Verify notice periods for cancellation to avoid automatic extensions.",
-        "Ensure all monetary, commission rates, and location details are clearly filled.",
-        "Identify and specify the governing law and arbitration venue clearly."
-    ]
+    dates = re.findall(
+        r"\b(?:\d{1,2}[/-]\d{1,2}[/-]\d{2,4}|\d{4}-\d{2}-\d{2}|"
+        r"(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+\d{4})\b",
+        text,
+        flags=re.I,
+    )
+    expiry = "Not specified"
+    for sentence in sentences:
+        if any(w in sentence.lower() for w in ["expir", "term of", "duration", "years from"]):
+            expiry = _clip(sentence, 160)
+            break
 
-    risk_score = 30
+    ml_label, ml_score = ml_risk_prediction(text)
     high_count = sum(1 for r in risks if r["severity"] == "High")
     med_count = sum(1 for r in risks if r["severity"] == "Medium")
-    risk_score += (high_count * 20) + (med_count * 10)
-    risk_score = min(max(risk_score, 10), 95)
-
-    risk_level = "Low"
-    if risk_score >= 70:
-        risk_level = "High"
-    elif risk_score >= 40:
-        risk_level = "Medium"
-
-    message = {
-        "Low": "✅ Low Risk — Document seems safe.",
-        "Medium": "⚠️ Medium Risk — Review recommended.",
-        "High": "🚨 High Risk — Possible legal risk, check carefully."
-    }.get(risk_level, "Unknown")
-
-    summary_text = (
-        f"This document ({filename or 'uploaded file'}) contains approximately {word_count} words. "
-        "Analysis found clauses covering liability, payment, and termination. "
+    risk_score = ml_score if ml_score is not None else min(max(20 + high_count * 18 + med_count * 10, 10), 95)
+    risk_level = ml_label if ml_label in ("Low", "Medium", "High") else (
+        "High" if risk_score >= 70 else "Medium" if risk_score >= 40 else "Low"
     )
-    if high_count > 0:
-        summary_text += f"We flagged {high_count} high-severity risk(s) that should be reviewed carefully."
-    else:
-        summary_text += "No high-risk restrictions were detected, but commercial clauses still need verification."
+
+    first_sentences = " ".join(sentences[:3]) if sentences else " ".join(text.split()[:60])
+    summary_text = (
+        f"{filename} ({word_count} words). "
+        f"{_clip(first_sentences, 420)}"
+    )
+
+    recommendations = [
+        "Confirm every amount, date, and party name is filled in before signing.",
+        "Check termination notice windows against how you actually operate.",
+        "Match liability caps to the real value of the deal.",
+    ]
+    if buckets["blank"]:
+        recommendations.insert(0, "Fill the blank/placeholder fields found in this document.")
+    if not buckets["dispute"]:
+        recommendations.append("Add governing law and a dispute forum.")
 
     return {
         "summary": summary_text,
         "risk": risk_level,
-        "message": message,
-        "risk_score": risk_score,
+        "message": {
+            "Low": "Low Risk — the uploaded text looks relatively standard.",
+            "Medium": "Medium Risk — review the flagged clauses in this file.",
+            "High": "High Risk — this file contains clauses that need careful review.",
+        }.get(risk_level, "Review recommended."),
+        "risk_score": int(risk_score),
         "sentiment": "Neutral" if risk_level == "Low" else "Restrictive",
-        "sentiment_score": 50 if risk_level == "Low" else 75,
-        "obligations": obligations,
+        "sentiment_score": 50 if risk_level == "Low" else 72,
+        "obligations": obligations[:8],
         "risks": risks,
-        "ambiguous": ambiguous,
+        "ambiguous": ambiguous or ["No obvious blanks found; still verify defined terms."],
         "clauses": clauses,
         "timeline": {
-            "draft": "Not explicitly stated in text",
-            "signing": "Not explicitly stated in text",
-            "expiry": "Varies (check auto-renewal terms)"
+            "draft": dates[0] if dates else "Not specified in text",
+            "signing": dates[1] if len(dates) > 1 else (dates[0] if dates else "Not specified in text"),
+            "expiry": expiry,
         },
         "recommendations": recommendations,
         "stats": {
             "word_count": word_count,
             "complexity_score": round(min(5 + (word_count / 1500), 9.5), 1),
-            "processing_time_sec": 2
+            "processing_time_sec": 2,
         },
-        "engine": "heuristics"
+        "engine": "ml+heuristics" if ml_label else "heuristics",
+        "filename": filename,
     }
 
 
@@ -331,11 +344,18 @@ def chat_with_openai(message: str, context: str) -> str:
     openai.api_key = os.getenv("OPENAI_API_KEY")
     system = (
         "You are LegalAI, a helpful legal document assistant. "
-        "Explain clauses in plain English. This is not formal legal advice."
+        "Explain clauses in plain English using the uploaded document. This is not formal legal advice."
     )
     user = message
+    pieces = []
+    if LAST_DOC.get("filename"):
+        pieces.append(f"Filename: {LAST_DOC['filename']}")
+    if LAST_DOC.get("text"):
+        pieces.append(LAST_DOC["text"][:3500])
     if context:
-        user = f"Document analysis context:\n{context[:4000]}\n\nUser question: {message}"
+        pieces.append(context[:2000])
+    if pieces:
+        user = "Document context:\n" + "\n".join(pieces) + f"\n\nUser question: {message}"
     response = openai.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
@@ -351,8 +371,17 @@ def chat_with_openai(message: str, context: str) -> str:
 def chat_with_gemini(message: str, context: str) -> str:
     key = os.getenv("GEMINI_API_KEY")
     prompt = message
+    extra = []
+    if LAST_DOC.get("text"):
+        extra.append(LAST_DOC["text"][:3500])
     if context:
-        prompt = f"You are LegalAI. Use this document analysis if relevant:\n{context[:4000]}\n\nQuestion: {message}"
+        extra.append(context[:2000])
+    if extra:
+        prompt = (
+            "You are LegalAI. Use this uploaded document:\n"
+            + "\n".join(extra)
+            + f"\n\nQuestion: {message}"
+        )
     url = (
         "https://generativelanguage.googleapis.com/v1beta/models/"
         f"gemini-2.0-flash:generateContent?key={key}"
@@ -364,41 +393,59 @@ def chat_with_gemini(message: str, context: str) -> str:
     return data["candidates"][0]["content"]["parts"][0]["text"]
 
 
+def _relevant_passages(message: str, text: str, limit: int = 3) -> list:
+    if not text:
+        return []
+    words = [w for w in re.findall(r"[a-zA-Z]{4,}", message.lower()) if w not in {
+        "what", "when", "where", "which", "this", "that", "have", "does", "about", "please", "tell"
+    }]
+    sentences = [s.strip() for s in re.split(r"(?<=[.!?])\s+", text) if len(s.strip()) > 20]
+    scored = []
+    for sentence in sentences:
+        lower = sentence.lower()
+        hits = sum(1 for w in words if w in lower)
+        if hits:
+            scored.append((hits, sentence))
+    scored.sort(key=lambda item: item[0], reverse=True)
+    return [item[1] for item in scored[:limit]]
+
+
 def chat_heuristic(message: str, context: str) -> str:
     lower = message.lower().strip()
-    replies = {
-        "what is a sale deed?": (
-            "A Sale Deed transfers ownership of property from seller to buyer. "
-            "It includes parties, property description, and consideration, and must be registered."
-        ),
-        "docs for registration": (
-            "Typical registration documents: original title deeds, property tax receipts, "
-            "ID/address proofs, two witnesses, and stamp-duty payment proof."
-        ),
-        "gift deed": (
-            "A Gift Deed transfers property voluntarily without payment. "
-            "It is valid only if executed and registered as required."
-        ),
-    }
-    if lower in replies:
-        return replies[lower]
     if "hello" in lower or lower in ("hi", "hey"):
-        return "Hello. I am LegalAI. Ask about a clause, risk, or your uploaded document."
+        name = LAST_DOC.get("filename") or "your uploaded document"
+        return f"Hello. I can answer from {name}. Ask about risks, payments, termination, or a specific clause."
+
+    analysis = LAST_DOC.get("analysis")
     if context:
         try:
             analysis = json.loads(context)
-            summary = analysis.get("summary") or "No summary stored."
-            risk = analysis.get("risk") or "Unknown"
-            return (
-                f"I am running in local mode (no API key). From your last analysis: "
-                f"overall risk is {risk}. {summary}"
-            )
         except Exception:
             pass
+
+    passages = _relevant_passages(message, LAST_DOC.get("text") or "")
+    if passages:
+        quoted = "\n".join(f"- {_clip(p, 260)}" for p in passages)
+        return (
+            f"From {LAST_DOC.get('filename') or 'the uploaded document'}:\n{quoted}\n\n"
+            "This is extracted from your file, not a canned sample. Add an API key in legalai/.env for a fuller AI explanation."
+        )
+
+    if analysis:
+        summary = analysis.get("summary") or ""
+        risk = analysis.get("risk") or "Unknown"
+        risks = analysis.get("risks") or []
+        if "risk" in lower:
+            notes = "; ".join(f"{r.get('name')}: {r.get('note')}" for r in risks[:3]) or summary
+            return f"Overall risk for {LAST_DOC.get('filename') or 'this file'} is {risk}. {notes}"
+        if "summar" in lower:
+            return summary or "No summary stored yet. Upload a PDF first."
+        if summary:
+            return f"I only have the last analysis for {LAST_DOC.get('filename') or 'this file'} (risk {risk}). {summary}"
+
     return (
-        "I can answer from your uploaded document analysis. "
-        "Upload a PDF on the home page, then ask about risks, obligations, or clauses. "
-        "Add OPENAI_API_KEY or GEMINI_API_KEY in legalai/.env for full AI chat."
+        "No matching clause found yet. Upload a PDF on the home page, then ask again. "
+        "Optional: set OPENAI_API_KEY in legalai/.env for GPT-powered answers."
     )
 
 
@@ -431,6 +478,7 @@ async def upload_file(file: UploadFile = File(...)):
         text = extract_document_text(dest, filename)
         if not text or not text.strip():
             return JSONResponse({"summary": "No text could be extracted from the file."}, status_code=200)
+        remember_document(filename, text)
         summary = summarize_text(text)
         return JSONResponse({"summary": summary, "filename": filename}, status_code=200)
     except HTTPException:
@@ -451,7 +499,9 @@ async def analyze_risk(file: UploadFile = File(...)):
                 empty_analysis("No readable text found. Upload a text-based PDF (not a scan-only image)."),
                 status_code=200,
             )
-        return JSONResponse(run_analysis(text, filename), status_code=200)
+        result = run_analysis(text, filename)
+        remember_document(filename, text, result)
+        return JSONResponse(result, status_code=200)
     except HTTPException:
         raise
     except Exception as e:
